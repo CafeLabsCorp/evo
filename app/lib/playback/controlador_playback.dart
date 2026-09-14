@@ -68,9 +68,28 @@ class ControladorPlayback extends ChangeNotifier {
   /// selecionada (ver `pacote.resultado.faixas`).
   int? _indiceParteSelecionada;
 
+  /// Velocidade-base do PLAYER (apresentação) que o seletor chama de
+  /// "1x" — em tiques por segundo. Isto é calibração de *reprodução na
+  /// tela*, nunca a duração real de um tique da simulação em si (o motor
+  /// não tem noção de tempo real, só de tiques discretos) e — mais
+  /// importante — **não é o mesmo conceito** de um eventual atributo de
+  /// domínio "velocidade" (0.5x/1x/2x de marcha, atribuído a uma pessoa
+  /// dentro de uma parte do catálogo). Se esse atributo existir um dia,
+  /// ele muda o resultado da simulação (quantos tiques uma pessoa leva pra
+  /// percorrer uma distância); isto aqui só muda o quão rápido o mesmo
+  /// resultado já simulado é mostrado. Não compartilhe constante nem nome
+  /// entre os dois — hoje eles não têm nenhuma relação no código, e é pra
+  /// continuar assim.
+  ///
+  /// Recalibrado em 2026-09: o "1x" antigo (6 tiques/s) estava rápido
+  /// demais no teste no celular; o novo "1x" é a metade da velocidade
+  /// antiga (o dobro da duração real de um tique — de ~166,7ms pra
+  /// ~333,3ms). Os multiplicadores do seletor (0.25x/0.5x/1x/1.5x/2x) são
+  /// sempre relativos a este valor.
+  static const double velocidadeBase1xTiquesPorSegundo = 3;
+
   double _tiqueAtual = 0;
-  double _velocidadeTiquesPorSegundo =
-      6; // 3 tempos/s — cadência de marcha legível.
+  double _velocidadeTiquesPorSegundo = velocidadeBase1xTiquesPorSegundo;
   bool _tocando = false;
 
   int? get indiceParteSelecionada => _indiceParteSelecionada;
@@ -93,6 +112,36 @@ class ControladorPlayback extends ChangeNotifier {
     _indiceParteSelecionada = indiceParte;
     _tiqueAtual = tiqueInicioFaixa.toDouble();
     notifyListeners();
+  }
+
+  /// Índice da parte que contém o tique atual do playhead — usado só pra
+  /// destacar a bolinha correspondente na fileira de partes. Funciona
+  /// independente do modo (evolução completa ou parte isolada) e mesmo
+  /// pausado: é sempre "onde o playhead está agora", não "qual faixa está
+  /// selecionada" (`indiceParteSelecionada`, que é `null` em modo
+  /// evolução completa mesmo com o playhead dentro de alguma parte).
+  int? get indiceParteEmReproducao {
+    for (final FaixaParte f in pacote.resultado.faixas) {
+      if (_tiqueAtual >= f.tiqueInicio && _tiqueAtual < f.tiqueFim) {
+        return f.indiceParte;
+      }
+    }
+    if (pacote.resultado.faixas.isNotEmpty &&
+        _tiqueAtual >= pacote.resultado.faixas.last.tiqueFim) {
+      return pacote.resultado.faixas.last.indiceParte;
+    }
+    return null;
+  }
+
+  /// Toque numa bolinha da fileira de partes, em modo evolução completa:
+  /// pula o playhead pro início daquela parte e começa a tocar dali até o
+  /// fim de verdade da evolução (não do início, e sem travar no fim da
+  /// parte clicada — isso é o modo "parte isolada", que é outra seleção).
+  void irParaParte(int indiceParte) {
+    pausar();
+    _indiceParteSelecionada = null;
+    _tiqueAtual = pacote.resultado.faixas[indiceParte].tiqueInicio.toDouble();
+    tocar();
   }
 
   void definirVelocidade(double tiquesPorSegundo) {
