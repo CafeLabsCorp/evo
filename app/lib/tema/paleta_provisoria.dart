@@ -21,7 +21,11 @@ class PaletaProvisoria {
   static const Color claro = Color(0xFFECECEC);
   static const Color cinzaMedio = Color(0xFF9AA0A6);
   static const Color cinzaEscuro = Color(0xFF3A3A3C);
-  static const Color grade = Color(0x33FFFFFF);
+  /// Linhas do grid — bem mais discretas que os pontos de cruzamento de
+  /// propósito: competiam com o conteúdo (reclamação de legibilidade de
+  /// 2026-09-14) e viraram opcionais (ver [FormacaoPainter.mostrarLinhas]).
+  /// Reduzido de 0x33 (~20% opacidade) pra isto (~8%) a pedido.
+  static const Color grade = Color(0x14FFFFFF);
   static const Color gradePonto = Color(0x59FFFFFF);
 
   /// Uso parcimonioso e deliberado: seleção, parte atual em reprodução,
