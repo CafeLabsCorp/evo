@@ -1,0 +1,14 @@
+# Dart/Flutter — cobre packages/evo_motor e app/ (o gitignore específico
+# gerado pelo `flutter create` dentro de app/ continua valendo também).
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+
+# IDEs
+.idea/
+*.iml
+
+# SO
+.DS_Store

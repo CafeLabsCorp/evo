@@ -1,0 +1,3233 @@
+{
+  "versaoCatalogo": 2,
+  "entrada": {
+    "nome": "Exemplo — bloco 3x3, avanço com quebra diagonal",
+    "estadoInicial": {
+      "slots": {
+        "0": {
+          "linha": 0,
+          "coluna": 0,
+          "setor": 0,
+          "cadencia": "firme"
+        },
+        "1": {
+          "linha": 0,
+          "coluna": 1,
+          "setor": 0,
+          "cadencia": "firme"
+        },
+        "2": {
+          "linha": 0,
+          "coluna": 2,
+          "setor": 0,
+          "cadencia": "firme"
+        },
+        "3": {
+          "linha": 1,
+          "coluna": 0,
+          "setor": 0,
+          "cadencia": "firme"
+        },
+        "4": {
+          "linha": 1,
+          "coluna": 1,
+          "setor": 0,
+          "cadencia": "firme"
+        },
+        "5": {
+          "linha": 1,
+          "coluna": 2,
+          "setor": 0,
+          "cadencia": "firme"
+        },
+        "6": {
+          "linha": 2,
+          "coluna": 0,
+          "setor": 0,
+          "cadencia": "firme"
+        },
+        "7": {
+          "linha": 2,
+          "coluna": 1,
+          "setor": 0,
+          "cadencia": "firme"
+        },
+        "8": {
+          "linha": 2,
+          "coluna": 2,
+          "setor": 0,
+          "cadencia": "firme"
+        }
+      }
+    },
+    "partes": [
+      {
+        "ordem": 0,
+        "nome": "Marcar passo",
+        "atribuicoes": {
+          "0": {
+            "movimento": {
+              "tipo": "marcarPasso",
+              "tempos": 4
+            }
+          },
+          "1": {
+            "movimento": {
+              "tipo": "marcarPasso",
+              "tempos": 4
+            }
+          },
+          "2": {
+            "movimento": {
+              "tipo": "marcarPasso",
+              "tempos": 4
+            }
+          },
+          "3": {
+            "movimento": {
+              "tipo": "marcarPasso",
+              "tempos": 4
+            }
+          },
+          "4": {
+            "movimento": {
+              "tipo": "marcarPasso",
+              "tempos": 4
+            }
+          },
+          "5": {
+            "movimento": {
+              "tipo": "marcarPasso",
+              "tempos": 4
+            }
+          },
+          "6": {
+            "movimento": {
+              "tipo": "marcarPasso",
+              "tempos": 4
+            }
+          },
+          "7": {
+            "movimento": {
+              "tipo": "marcarPasso",
+              "tempos": 4
+            }
+          },
+          "8": {
+            "movimento": {
+              "tipo": "marcarPasso",
+              "tempos": 4
+            }
+          }
+        }
+      },
+      {
+        "ordem": 1,
+        "nome": "Em frente, marche",
+        "atribuicoes": {
+          "0": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 4,
+              "aoTerminar": "marchando"
+            }
+          },
+          "1": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 4,
+              "aoTerminar": "marchando"
+            }
+          },
+          "2": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 4,
+              "aoTerminar": "marchando"
+            }
+          },
+          "3": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 4,
+              "aoTerminar": "marchando"
+            }
+          },
+          "4": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 4,
+              "aoTerminar": "marchando"
+            }
+          },
+          "5": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 4,
+              "aoTerminar": "marchando"
+            }
+          },
+          "6": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 4,
+              "aoTerminar": "marchando"
+            }
+          },
+          "7": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 4,
+              "aoTerminar": "marchando"
+            }
+          },
+          "8": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 4,
+              "aoTerminar": "marchando"
+            }
+          }
+        }
+      },
+      {
+        "ordem": 2,
+        "nome": "Oitava à direita, em marcha",
+        "atribuicoes": {
+          "0": {
+            "movimento": {
+              "tipo": "oitavaDireitaMarcha"
+            }
+          },
+          "1": {
+            "movimento": {
+              "tipo": "oitavaDireitaMarcha"
+            }
+          },
+          "2": {
+            "movimento": {
+              "tipo": "oitavaDireitaMarcha"
+            }
+          },
+          "3": {
+            "movimento": {
+              "tipo": "oitavaDireitaMarcha"
+            }
+          },
+          "4": {
+            "movimento": {
+              "tipo": "oitavaDireitaMarcha"
+            }
+          },
+          "5": {
+            "movimento": {
+              "tipo": "oitavaDireitaMarcha"
+            }
+          },
+          "6": {
+            "movimento": {
+              "tipo": "oitavaDireitaMarcha"
+            }
+          },
+          "7": {
+            "movimento": {
+              "tipo": "oitavaDireitaMarcha"
+            }
+          },
+          "8": {
+            "movimento": {
+              "tipo": "oitavaDireitaMarcha"
+            }
+          }
+        }
+      },
+      {
+        "ordem": 3,
+        "nome": "Em frente, marche (diagonal)",
+        "atribuicoes": {
+          "0": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 3,
+              "aoTerminar": "marchando"
+            }
+          },
+          "1": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 3,
+              "aoTerminar": "marchando"
+            }
+          },
+          "2": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 3,
+              "aoTerminar": "marchando"
+            }
+          },
+          "3": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 3,
+              "aoTerminar": "marchando"
+            }
+          },
+          "4": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 3,
+              "aoTerminar": "marchando"
+            }
+          },
+          "5": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 3,
+              "aoTerminar": "marchando"
+            }
+          },
+          "6": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 3,
+              "aoTerminar": "marchando"
+            }
+          },
+          "7": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 3,
+              "aoTerminar": "marchando"
+            }
+          },
+          "8": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 3,
+              "aoTerminar": "marchando"
+            }
+          }
+        }
+      },
+      {
+        "ordem": 4,
+        "nome": "Direita volver, em marcha",
+        "atribuicoes": {
+          "0": {
+            "movimento": {
+              "tipo": "direitaVolverMarcha"
+            }
+          },
+          "1": {
+            "movimento": {
+              "tipo": "direitaVolverMarcha"
+            }
+          },
+          "2": {
+            "movimento": {
+              "tipo": "direitaVolverMarcha"
+            }
+          },
+          "3": {
+            "movimento": {
+              "tipo": "direitaVolverMarcha"
+            }
+          },
+          "4": {
+            "movimento": {
+              "tipo": "direitaVolverMarcha"
+            }
+          },
+          "5": {
+            "movimento": {
+              "tipo": "direitaVolverMarcha"
+            }
+          },
+          "6": {
+            "movimento": {
+              "tipo": "direitaVolverMarcha"
+            }
+          },
+          "7": {
+            "movimento": {
+              "tipo": "direitaVolverMarcha"
+            }
+          },
+          "8": {
+            "movimento": {
+              "tipo": "direitaVolverMarcha"
+            }
+          }
+        }
+      },
+      {
+        "ordem": 5,
+        "nome": "Em frente, marche",
+        "atribuicoes": {
+          "0": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 3,
+              "aoTerminar": "marchando"
+            }
+          },
+          "1": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 3,
+              "aoTerminar": "marchando"
+            }
+          },
+          "2": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 3,
+              "aoTerminar": "marchando"
+            }
+          },
+          "3": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 3,
+              "aoTerminar": "marchando"
+            }
+          },
+          "4": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 3,
+              "aoTerminar": "marchando"
+            }
+          },
+          "5": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 3,
+              "aoTerminar": "marchando"
+            }
+          },
+          "6": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 3,
+              "aoTerminar": "marchando"
+            }
+          },
+          "7": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 3,
+              "aoTerminar": "marchando"
+            }
+          },
+          "8": {
+            "movimento": {
+              "tipo": "emFrenteMarche",
+              "n": 3,
+              "aoTerminar": "marchando"
+            }
+          }
+        }
+      },
+      {
+        "ordem": 6,
+        "nome": "Alto",
+        "atribuicoes": {
+          "0": {
+            "movimento": {
+              "tipo": "alto"
+            }
+          },
+          "1": {
+            "movimento": {
+              "tipo": "alto"
+            }
+          },
+          "2": {
+            "movimento": {
+              "tipo": "alto"
+            }
+          },
+          "3": {
+            "movimento": {
+              "tipo": "alto"
+            }
+          },
+          "4": {
+            "movimento": {
+              "tipo": "alto"
+            }
+          },
+          "5": {
+            "movimento": {
+              "tipo": "alto"
+            }
+          },
+          "6": {
+            "movimento": {
+              "tipo": "alto"
+            }
+          },
+          "7": {
+            "movimento": {
+              "tipo": "alto"
+            }
+          },
+          "8": {
+            "movimento": {
+              "tipo": "alto"
+            }
+          }
+        }
+      },
+      {
+        "ordem": 7,
+        "nome": "Fileira da frente meia-volta, resto sentido (simultâneo)",
+        "atribuicoes": {
+          "0": {
+            "movimento": {
+              "tipo": "meiaVoltaParado"
+            }
+          },
+          "1": {
+            "movimento": {
+              "tipo": "meiaVoltaParado"
+            }
+          },
+          "2": {
+            "movimento": {
+              "tipo": "meiaVoltaParado"
+            }
+          },
+          "3": {
+            "movimento": {
+              "tipo": "sentido",
+              "tempos": 1
+            }
+          },
+          "4": {
+            "movimento": {
+              "tipo": "sentido",
+              "tempos": 1
+            }
+          },
+          "5": {
+            "movimento": {
+              "tipo": "sentido",
+              "tempos": 1
+            }
+          },
+          "6": {
+            "movimento": {
+              "tipo": "sentido",
+              "tempos": 1
+            }
+          },
+          "7": {
+            "movimento": {
+              "tipo": "sentido",
+              "tempos": 1
+            }
+          },
+          "8": {
+            "movimento": {
+              "tipo": "sentido",
+              "tempos": 1
+            }
+          }
+        }
+      }
+    ]
+  },
+  "saida": [
+    {
+      "0": {
+        "x": 0,
+        "y": 0,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "1": {
+        "x": 4,
+        "y": 0,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "2": {
+        "x": 8,
+        "y": 0,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "3": {
+        "x": 0,
+        "y": 4,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "4": {
+        "x": 4,
+        "y": 4,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "5": {
+        "x": 8,
+        "y": 4,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "6": {
+        "x": 0,
+        "y": 8,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "7": {
+        "x": 4,
+        "y": 8,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "8": {
+        "x": 8,
+        "y": 8,
+        "dir": 0,
+        "cad": "firme"
+      }
+    },
+    {
+      "0": {
+        "x": 0,
+        "y": 0,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "1": {
+        "x": 4,
+        "y": 0,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "2": {
+        "x": 8,
+        "y": 0,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "3": {
+        "x": 0,
+        "y": 4,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "4": {
+        "x": 4,
+        "y": 4,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "5": {
+        "x": 8,
+        "y": 4,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "6": {
+        "x": 0,
+        "y": 8,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "7": {
+        "x": 4,
+        "y": 8,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "8": {
+        "x": 8,
+        "y": 8,
+        "dir": 0,
+        "cad": "firme"
+      }
+    },
+    {
+      "0": {
+        "x": 0,
+        "y": 0,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "1": {
+        "x": 4,
+        "y": 0,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "2": {
+        "x": 8,
+        "y": 0,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "3": {
+        "x": 0,
+        "y": 4,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "4": {
+        "x": 4,
+        "y": 4,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "5": {
+        "x": 8,
+        "y": 4,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "6": {
+        "x": 0,
+        "y": 8,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "7": {
+        "x": 4,
+        "y": 8,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "8": {
+        "x": 8,
+        "y": 8,
+        "dir": 0,
+        "cad": "firme"
+      }
+    },
+    {
+      "0": {
+        "x": 0,
+        "y": 0,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "1": {
+        "x": 4,
+        "y": 0,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "2": {
+        "x": 8,
+        "y": 0,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "3": {
+        "x": 0,
+        "y": 4,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "4": {
+        "x": 4,
+        "y": 4,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "5": {
+        "x": 8,
+        "y": 4,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "6": {
+        "x": 0,
+        "y": 8,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "7": {
+        "x": 4,
+        "y": 8,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "8": {
+        "x": 8,
+        "y": 8,
+        "dir": 0,
+        "cad": "firme"
+      }
+    },
+    {
+      "0": {
+        "x": 0,
+        "y": 0,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "1": {
+        "x": 4,
+        "y": 0,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "2": {
+        "x": 8,
+        "y": 0,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "3": {
+        "x": 0,
+        "y": 4,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "4": {
+        "x": 4,
+        "y": 4,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "5": {
+        "x": 8,
+        "y": 4,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "6": {
+        "x": 0,
+        "y": 8,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "7": {
+        "x": 4,
+        "y": 8,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "8": {
+        "x": 8,
+        "y": 8,
+        "dir": 0,
+        "cad": "firme"
+      }
+    },
+    {
+      "0": {
+        "x": 0,
+        "y": 0,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "1": {
+        "x": 4,
+        "y": 0,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "2": {
+        "x": 8,
+        "y": 0,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "3": {
+        "x": 0,
+        "y": 4,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "4": {
+        "x": 4,
+        "y": 4,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "5": {
+        "x": 8,
+        "y": 4,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "6": {
+        "x": 0,
+        "y": 8,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "7": {
+        "x": 4,
+        "y": 8,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "8": {
+        "x": 8,
+        "y": 8,
+        "dir": 0,
+        "cad": "firme"
+      }
+    },
+    {
+      "0": {
+        "x": 0,
+        "y": 0,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "1": {
+        "x": 4,
+        "y": 0,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "2": {
+        "x": 8,
+        "y": 0,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "3": {
+        "x": 0,
+        "y": 4,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "4": {
+        "x": 4,
+        "y": 4,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "5": {
+        "x": 8,
+        "y": 4,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "6": {
+        "x": 0,
+        "y": 8,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "7": {
+        "x": 4,
+        "y": 8,
+        "dir": 0,
+        "cad": "firme"
+      },
+      "8": {
+        "x": 8,
+        "y": 8,
+        "dir": 0,
+        "cad": "firme"
+      }
+    },
+    {
+      "0": {
+        "x": 0,
+        "y": 0,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "1": {
+        "x": 4,
+        "y": 0,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "2": {
+        "x": 8,
+        "y": 0,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "3": {
+        "x": 0,
+        "y": 4,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "4": {
+        "x": 4,
+        "y": 4,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "5": {
+        "x": 8,
+        "y": 4,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "6": {
+        "x": 0,
+        "y": 8,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "7": {
+        "x": 4,
+        "y": 8,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "8": {
+        "x": 8,
+        "y": 8,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      }
+    },
+    {
+      "0": {
+        "x": 0,
+        "y": -2,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "1": {
+        "x": 4,
+        "y": -2,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "2": {
+        "x": 8,
+        "y": -2,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "3": {
+        "x": 0,
+        "y": 2,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "4": {
+        "x": 4,
+        "y": 2,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "5": {
+        "x": 8,
+        "y": 2,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "6": {
+        "x": 0,
+        "y": 6,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "7": {
+        "x": 4,
+        "y": 6,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "8": {
+        "x": 8,
+        "y": 6,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      }
+    },
+    {
+      "0": {
+        "x": 0,
+        "y": -4,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "1": {
+        "x": 4,
+        "y": -4,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "2": {
+        "x": 8,
+        "y": -4,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "3": {
+        "x": 0,
+        "y": 0,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "4": {
+        "x": 4,
+        "y": 0,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "5": {
+        "x": 8,
+        "y": 0,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "6": {
+        "x": 0,
+        "y": 4,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "7": {
+        "x": 4,
+        "y": 4,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "8": {
+        "x": 8,
+        "y": 4,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      }
+    },
+    {
+      "0": {
+        "x": 0,
+        "y": -6,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "1": {
+        "x": 4,
+        "y": -6,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "2": {
+        "x": 8,
+        "y": -6,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "3": {
+        "x": 0,
+        "y": -2,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "4": {
+        "x": 4,
+        "y": -2,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "5": {
+        "x": 8,
+        "y": -2,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "6": {
+        "x": 0,
+        "y": 2,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "7": {
+        "x": 4,
+        "y": 2,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "8": {
+        "x": 8,
+        "y": 2,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      }
+    },
+    {
+      "0": {
+        "x": 0,
+        "y": -8,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "1": {
+        "x": 4,
+        "y": -8,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "2": {
+        "x": 8,
+        "y": -8,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "3": {
+        "x": 0,
+        "y": -4,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "4": {
+        "x": 4,
+        "y": -4,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "5": {
+        "x": 8,
+        "y": -4,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "6": {
+        "x": 0,
+        "y": 0,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "7": {
+        "x": 4,
+        "y": 0,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "8": {
+        "x": 8,
+        "y": 0,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      }
+    },
+    {
+      "0": {
+        "x": 0,
+        "y": -10,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "1": {
+        "x": 4,
+        "y": -10,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "2": {
+        "x": 8,
+        "y": -10,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "3": {
+        "x": 0,
+        "y": -6,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "4": {
+        "x": 4,
+        "y": -6,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "5": {
+        "x": 8,
+        "y": -6,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "6": {
+        "x": 0,
+        "y": -2,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "7": {
+        "x": 4,
+        "y": -2,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "8": {
+        "x": 8,
+        "y": -2,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      }
+    },
+    {
+      "0": {
+        "x": 0,
+        "y": -12,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "1": {
+        "x": 4,
+        "y": -12,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "2": {
+        "x": 8,
+        "y": -12,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "3": {
+        "x": 0,
+        "y": -8,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "4": {
+        "x": 4,
+        "y": -8,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "5": {
+        "x": 8,
+        "y": -8,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "6": {
+        "x": 0,
+        "y": -4,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "7": {
+        "x": 4,
+        "y": -4,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "8": {
+        "x": 8,
+        "y": -4,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      }
+    },
+    {
+      "0": {
+        "x": 0,
+        "y": -14,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "1": {
+        "x": 4,
+        "y": -14,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "2": {
+        "x": 8,
+        "y": -14,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "3": {
+        "x": 0,
+        "y": -10,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "4": {
+        "x": 4,
+        "y": -10,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "5": {
+        "x": 8,
+        "y": -10,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "6": {
+        "x": 0,
+        "y": -6,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "7": {
+        "x": 4,
+        "y": -6,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      },
+      "8": {
+        "x": 8,
+        "y": -6,
+        "dir": 0,
+        "cad": "marcandoPasso"
+      }
+    },
+    {
+      "0": {
+        "x": 0,
+        "y": -16,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "1": {
+        "x": 4,
+        "y": -16,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "2": {
+        "x": 8,
+        "y": -16,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "3": {
+        "x": 0,
+        "y": -12,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "4": {
+        "x": 4,
+        "y": -12,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "5": {
+        "x": 8,
+        "y": -12,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "6": {
+        "x": 0,
+        "y": -8,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "7": {
+        "x": 4,
+        "y": -8,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "8": {
+        "x": 8,
+        "y": -8,
+        "dir": 0,
+        "cad": "marchando"
+      }
+    },
+    {
+      "0": {
+        "x": 0,
+        "y": -18,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "1": {
+        "x": 4,
+        "y": -18,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "2": {
+        "x": 8,
+        "y": -18,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "3": {
+        "x": 0,
+        "y": -14,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "4": {
+        "x": 4,
+        "y": -14,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "5": {
+        "x": 8,
+        "y": -14,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "6": {
+        "x": 0,
+        "y": -10,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "7": {
+        "x": 4,
+        "y": -10,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "8": {
+        "x": 8,
+        "y": -10,
+        "dir": 0,
+        "cad": "marchando"
+      }
+    },
+    {
+      "0": {
+        "x": 0,
+        "y": -20,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "1": {
+        "x": 4,
+        "y": -20,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "2": {
+        "x": 8,
+        "y": -20,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "3": {
+        "x": 0,
+        "y": -16,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "4": {
+        "x": 4,
+        "y": -16,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "5": {
+        "x": 8,
+        "y": -16,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "6": {
+        "x": 0,
+        "y": -12,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "7": {
+        "x": 4,
+        "y": -12,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "8": {
+        "x": 8,
+        "y": -12,
+        "dir": 0,
+        "cad": "marchando"
+      }
+    },
+    {
+      "0": {
+        "x": 0,
+        "y": -20,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "1": {
+        "x": 4,
+        "y": -20,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "2": {
+        "x": 8,
+        "y": -20,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "3": {
+        "x": 0,
+        "y": -16,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "4": {
+        "x": 4,
+        "y": -16,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "5": {
+        "x": 8,
+        "y": -16,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "6": {
+        "x": 0,
+        "y": -12,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "7": {
+        "x": 4,
+        "y": -12,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "8": {
+        "x": 8,
+        "y": -12,
+        "dir": 0,
+        "cad": "marchando"
+      }
+    },
+    {
+      "0": {
+        "x": 0,
+        "y": -20,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "1": {
+        "x": 4,
+        "y": -20,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "2": {
+        "x": 8,
+        "y": -20,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "3": {
+        "x": 0,
+        "y": -16,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "4": {
+        "x": 4,
+        "y": -16,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "5": {
+        "x": 8,
+        "y": -16,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "6": {
+        "x": 0,
+        "y": -12,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "7": {
+        "x": 4,
+        "y": -12,
+        "dir": 0,
+        "cad": "marchando"
+      },
+      "8": {
+        "x": 8,
+        "y": -12,
+        "dir": 0,
+        "cad": "marchando"
+      }
+    },
+    {
+      "0": {
+        "x": 0,
+        "y": -20,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "1": {
+        "x": 4,
+        "y": -20,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "2": {
+        "x": 8,
+        "y": -20,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "3": {
+        "x": 0,
+        "y": -16,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "4": {
+        "x": 4,
+        "y": -16,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "5": {
+        "x": 8,
+        "y": -16,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "6": {
+        "x": 0,
+        "y": -12,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "7": {
+        "x": 4,
+        "y": -12,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "8": {
+        "x": 8,
+        "y": -12,
+        "dir": 1,
+        "cad": "marchando"
+      }
+    },
+    {
+      "0": {
+        "x": 0,
+        "y": -20,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "1": {
+        "x": 4,
+        "y": -20,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "2": {
+        "x": 8,
+        "y": -20,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "3": {
+        "x": 0,
+        "y": -16,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "4": {
+        "x": 4,
+        "y": -16,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "5": {
+        "x": 8,
+        "y": -16,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "6": {
+        "x": 0,
+        "y": -12,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "7": {
+        "x": 4,
+        "y": -12,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "8": {
+        "x": 8,
+        "y": -12,
+        "dir": 1,
+        "cad": "firme"
+      }
+    },
+    {
+      "0": {
+        "x": 1,
+        "y": -21,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "1": {
+        "x": 5,
+        "y": -21,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "2": {
+        "x": 9,
+        "y": -21,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "3": {
+        "x": 1,
+        "y": -17,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "4": {
+        "x": 5,
+        "y": -17,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "5": {
+        "x": 9,
+        "y": -17,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "6": {
+        "x": 1,
+        "y": -13,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "7": {
+        "x": 5,
+        "y": -13,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "8": {
+        "x": 9,
+        "y": -13,
+        "dir": 1,
+        "cad": "firme"
+      }
+    },
+    {
+      "0": {
+        "x": 2,
+        "y": -22,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "1": {
+        "x": 6,
+        "y": -22,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "2": {
+        "x": 10,
+        "y": -22,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "3": {
+        "x": 2,
+        "y": -18,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "4": {
+        "x": 6,
+        "y": -18,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "5": {
+        "x": 10,
+        "y": -18,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "6": {
+        "x": 2,
+        "y": -14,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "7": {
+        "x": 6,
+        "y": -14,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "8": {
+        "x": 10,
+        "y": -14,
+        "dir": 1,
+        "cad": "firme"
+      }
+    },
+    {
+      "0": {
+        "x": 3,
+        "y": -23,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "1": {
+        "x": 7,
+        "y": -23,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "2": {
+        "x": 11,
+        "y": -23,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "3": {
+        "x": 3,
+        "y": -19,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "4": {
+        "x": 7,
+        "y": -19,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "5": {
+        "x": 11,
+        "y": -19,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "6": {
+        "x": 3,
+        "y": -15,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "7": {
+        "x": 7,
+        "y": -15,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "8": {
+        "x": 11,
+        "y": -15,
+        "dir": 1,
+        "cad": "firme"
+      }
+    },
+    {
+      "0": {
+        "x": 4,
+        "y": -24,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "1": {
+        "x": 8,
+        "y": -24,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "2": {
+        "x": 12,
+        "y": -24,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "3": {
+        "x": 4,
+        "y": -20,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "4": {
+        "x": 8,
+        "y": -20,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "5": {
+        "x": 12,
+        "y": -20,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "6": {
+        "x": 4,
+        "y": -16,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "7": {
+        "x": 8,
+        "y": -16,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "8": {
+        "x": 12,
+        "y": -16,
+        "dir": 1,
+        "cad": "firme"
+      }
+    },
+    {
+      "0": {
+        "x": 5,
+        "y": -25,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "1": {
+        "x": 9,
+        "y": -25,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "2": {
+        "x": 13,
+        "y": -25,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "3": {
+        "x": 5,
+        "y": -21,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "4": {
+        "x": 9,
+        "y": -21,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "5": {
+        "x": 13,
+        "y": -21,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "6": {
+        "x": 5,
+        "y": -17,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "7": {
+        "x": 9,
+        "y": -17,
+        "dir": 1,
+        "cad": "firme"
+      },
+      "8": {
+        "x": 13,
+        "y": -17,
+        "dir": 1,
+        "cad": "firme"
+      }
+    },
+    {
+      "0": {
+        "x": 6,
+        "y": -26,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "1": {
+        "x": 10,
+        "y": -26,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "2": {
+        "x": 14,
+        "y": -26,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "3": {
+        "x": 6,
+        "y": -22,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "4": {
+        "x": 10,
+        "y": -22,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "5": {
+        "x": 14,
+        "y": -22,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "6": {
+        "x": 6,
+        "y": -18,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "7": {
+        "x": 10,
+        "y": -18,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "8": {
+        "x": 14,
+        "y": -18,
+        "dir": 1,
+        "cad": "marchando"
+      }
+    },
+    {
+      "0": {
+        "x": 7,
+        "y": -27,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "1": {
+        "x": 11,
+        "y": -27,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "2": {
+        "x": 15,
+        "y": -27,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "3": {
+        "x": 7,
+        "y": -23,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "4": {
+        "x": 11,
+        "y": -23,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "5": {
+        "x": 15,
+        "y": -23,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "6": {
+        "x": 7,
+        "y": -19,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "7": {
+        "x": 11,
+        "y": -19,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "8": {
+        "x": 15,
+        "y": -19,
+        "dir": 1,
+        "cad": "marchando"
+      }
+    },
+    {
+      "0": {
+        "x": 8,
+        "y": -28,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "1": {
+        "x": 12,
+        "y": -28,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "2": {
+        "x": 16,
+        "y": -28,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "3": {
+        "x": 8,
+        "y": -24,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "4": {
+        "x": 12,
+        "y": -24,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "5": {
+        "x": 16,
+        "y": -24,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "6": {
+        "x": 8,
+        "y": -20,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "7": {
+        "x": 12,
+        "y": -20,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "8": {
+        "x": 16,
+        "y": -20,
+        "dir": 1,
+        "cad": "marchando"
+      }
+    },
+    {
+      "0": {
+        "x": 8,
+        "y": -28,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "1": {
+        "x": 12,
+        "y": -28,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "2": {
+        "x": 16,
+        "y": -28,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "3": {
+        "x": 8,
+        "y": -24,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "4": {
+        "x": 12,
+        "y": -24,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "5": {
+        "x": 16,
+        "y": -24,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "6": {
+        "x": 8,
+        "y": -20,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "7": {
+        "x": 12,
+        "y": -20,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "8": {
+        "x": 16,
+        "y": -20,
+        "dir": 1,
+        "cad": "marchando"
+      }
+    },
+    {
+      "0": {
+        "x": 8,
+        "y": -28,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "1": {
+        "x": 12,
+        "y": -28,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "2": {
+        "x": 16,
+        "y": -28,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "3": {
+        "x": 8,
+        "y": -24,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "4": {
+        "x": 12,
+        "y": -24,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "5": {
+        "x": 16,
+        "y": -24,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "6": {
+        "x": 8,
+        "y": -20,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "7": {
+        "x": 12,
+        "y": -20,
+        "dir": 1,
+        "cad": "marchando"
+      },
+      "8": {
+        "x": 16,
+        "y": -20,
+        "dir": 1,
+        "cad": "marchando"
+      }
+    },
+    {
+      "0": {
+        "x": 8,
+        "y": -28,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "1": {
+        "x": 12,
+        "y": -28,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "2": {
+        "x": 16,
+        "y": -28,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "3": {
+        "x": 8,
+        "y": -24,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "4": {
+        "x": 12,
+        "y": -24,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "5": {
+        "x": 16,
+        "y": -24,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "6": {
+        "x": 8,
+        "y": -20,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "7": {
+        "x": 12,
+        "y": -20,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "8": {
+        "x": 16,
+        "y": -20,
+        "dir": 3,
+        "cad": "marchando"
+      }
+    },
+    {
+      "0": {
+        "x": 8,
+        "y": -28,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "1": {
+        "x": 12,
+        "y": -28,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "2": {
+        "x": 16,
+        "y": -28,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "3": {
+        "x": 8,
+        "y": -24,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "4": {
+        "x": 12,
+        "y": -24,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "5": {
+        "x": 16,
+        "y": -24,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "6": {
+        "x": 8,
+        "y": -20,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "7": {
+        "x": 12,
+        "y": -20,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "8": {
+        "x": 16,
+        "y": -20,
+        "dir": 3,
+        "cad": "firme"
+      }
+    },
+    {
+      "0": {
+        "x": 9,
+        "y": -27,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "1": {
+        "x": 13,
+        "y": -27,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "2": {
+        "x": 17,
+        "y": -27,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "3": {
+        "x": 9,
+        "y": -23,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "4": {
+        "x": 13,
+        "y": -23,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "5": {
+        "x": 17,
+        "y": -23,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "6": {
+        "x": 9,
+        "y": -19,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "7": {
+        "x": 13,
+        "y": -19,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "8": {
+        "x": 17,
+        "y": -19,
+        "dir": 3,
+        "cad": "firme"
+      }
+    },
+    {
+      "0": {
+        "x": 10,
+        "y": -26,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "1": {
+        "x": 14,
+        "y": -26,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "2": {
+        "x": 18,
+        "y": -26,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "3": {
+        "x": 10,
+        "y": -22,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "4": {
+        "x": 14,
+        "y": -22,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "5": {
+        "x": 18,
+        "y": -22,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "6": {
+        "x": 10,
+        "y": -18,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "7": {
+        "x": 14,
+        "y": -18,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "8": {
+        "x": 18,
+        "y": -18,
+        "dir": 3,
+        "cad": "firme"
+      }
+    },
+    {
+      "0": {
+        "x": 11,
+        "y": -25,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "1": {
+        "x": 15,
+        "y": -25,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "2": {
+        "x": 19,
+        "y": -25,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "3": {
+        "x": 11,
+        "y": -21,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "4": {
+        "x": 15,
+        "y": -21,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "5": {
+        "x": 19,
+        "y": -21,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "6": {
+        "x": 11,
+        "y": -17,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "7": {
+        "x": 15,
+        "y": -17,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "8": {
+        "x": 19,
+        "y": -17,
+        "dir": 3,
+        "cad": "firme"
+      }
+    },
+    {
+      "0": {
+        "x": 12,
+        "y": -24,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "1": {
+        "x": 16,
+        "y": -24,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "2": {
+        "x": 20,
+        "y": -24,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "3": {
+        "x": 12,
+        "y": -20,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "4": {
+        "x": 16,
+        "y": -20,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "5": {
+        "x": 20,
+        "y": -20,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "6": {
+        "x": 12,
+        "y": -16,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "7": {
+        "x": 16,
+        "y": -16,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "8": {
+        "x": 20,
+        "y": -16,
+        "dir": 3,
+        "cad": "firme"
+      }
+    },
+    {
+      "0": {
+        "x": 13,
+        "y": -23,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "1": {
+        "x": 17,
+        "y": -23,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "2": {
+        "x": 21,
+        "y": -23,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "3": {
+        "x": 13,
+        "y": -19,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "4": {
+        "x": 17,
+        "y": -19,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "5": {
+        "x": 21,
+        "y": -19,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "6": {
+        "x": 13,
+        "y": -15,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "7": {
+        "x": 17,
+        "y": -15,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "8": {
+        "x": 21,
+        "y": -15,
+        "dir": 3,
+        "cad": "firme"
+      }
+    },
+    {
+      "0": {
+        "x": 14,
+        "y": -22,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "1": {
+        "x": 18,
+        "y": -22,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "2": {
+        "x": 22,
+        "y": -22,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "3": {
+        "x": 14,
+        "y": -18,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "4": {
+        "x": 18,
+        "y": -18,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "5": {
+        "x": 22,
+        "y": -18,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "6": {
+        "x": 14,
+        "y": -14,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "7": {
+        "x": 18,
+        "y": -14,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "8": {
+        "x": 22,
+        "y": -14,
+        "dir": 3,
+        "cad": "marchando"
+      }
+    },
+    {
+      "0": {
+        "x": 15,
+        "y": -21,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "1": {
+        "x": 19,
+        "y": -21,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "2": {
+        "x": 23,
+        "y": -21,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "3": {
+        "x": 15,
+        "y": -17,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "4": {
+        "x": 19,
+        "y": -17,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "5": {
+        "x": 23,
+        "y": -17,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "6": {
+        "x": 15,
+        "y": -13,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "7": {
+        "x": 19,
+        "y": -13,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "8": {
+        "x": 23,
+        "y": -13,
+        "dir": 3,
+        "cad": "marchando"
+      }
+    },
+    {
+      "0": {
+        "x": 16,
+        "y": -20,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "1": {
+        "x": 20,
+        "y": -20,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "2": {
+        "x": 24,
+        "y": -20,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "3": {
+        "x": 16,
+        "y": -16,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "4": {
+        "x": 20,
+        "y": -16,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "5": {
+        "x": 24,
+        "y": -16,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "6": {
+        "x": 16,
+        "y": -12,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "7": {
+        "x": 20,
+        "y": -12,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "8": {
+        "x": 24,
+        "y": -12,
+        "dir": 3,
+        "cad": "marchando"
+      }
+    },
+    {
+      "0": {
+        "x": 16,
+        "y": -20,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "1": {
+        "x": 20,
+        "y": -20,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "2": {
+        "x": 24,
+        "y": -20,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "3": {
+        "x": 16,
+        "y": -16,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "4": {
+        "x": 20,
+        "y": -16,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "5": {
+        "x": 24,
+        "y": -16,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "6": {
+        "x": 16,
+        "y": -12,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "7": {
+        "x": 20,
+        "y": -12,
+        "dir": 3,
+        "cad": "marchando"
+      },
+      "8": {
+        "x": 24,
+        "y": -12,
+        "dir": 3,
+        "cad": "marchando"
+      }
+    },
+    {
+      "0": {
+        "x": 16,
+        "y": -20,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "1": {
+        "x": 20,
+        "y": -20,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "2": {
+        "x": 24,
+        "y": -20,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "3": {
+        "x": 16,
+        "y": -16,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "4": {
+        "x": 20,
+        "y": -16,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "5": {
+        "x": 24,
+        "y": -16,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "6": {
+        "x": 16,
+        "y": -12,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "7": {
+        "x": 20,
+        "y": -12,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "8": {
+        "x": 24,
+        "y": -12,
+        "dir": 3,
+        "cad": "firme"
+      }
+    },
+    {
+      "0": {
+        "x": 16,
+        "y": -20,
+        "dir": 7,
+        "cad": "firme"
+      },
+      "1": {
+        "x": 20,
+        "y": -20,
+        "dir": 7,
+        "cad": "firme"
+      },
+      "2": {
+        "x": 24,
+        "y": -20,
+        "dir": 7,
+        "cad": "firme"
+      },
+      "3": {
+        "x": 16,
+        "y": -16,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "4": {
+        "x": 20,
+        "y": -16,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "5": {
+        "x": 24,
+        "y": -16,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "6": {
+        "x": 16,
+        "y": -12,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "7": {
+        "x": 20,
+        "y": -12,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "8": {
+        "x": 24,
+        "y": -12,
+        "dir": 3,
+        "cad": "firme"
+      }
+    },
+    {
+      "0": {
+        "x": 16,
+        "y": -20,
+        "dir": 7,
+        "cad": "firme"
+      },
+      "1": {
+        "x": 20,
+        "y": -20,
+        "dir": 7,
+        "cad": "firme"
+      },
+      "2": {
+        "x": 24,
+        "y": -20,
+        "dir": 7,
+        "cad": "firme"
+      },
+      "3": {
+        "x": 16,
+        "y": -16,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "4": {
+        "x": 20,
+        "y": -16,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "5": {
+        "x": 24,
+        "y": -16,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "6": {
+        "x": 16,
+        "y": -12,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "7": {
+        "x": 20,
+        "y": -12,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "8": {
+        "x": 24,
+        "y": -12,
+        "dir": 3,
+        "cad": "firme"
+      }
+    },
+    {
+      "0": {
+        "x": 16,
+        "y": -20,
+        "dir": 7,
+        "cad": "firme"
+      },
+      "1": {
+        "x": 20,
+        "y": -20,
+        "dir": 7,
+        "cad": "firme"
+      },
+      "2": {
+        "x": 24,
+        "y": -20,
+        "dir": 7,
+        "cad": "firme"
+      },
+      "3": {
+        "x": 16,
+        "y": -16,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "4": {
+        "x": 20,
+        "y": -16,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "5": {
+        "x": 24,
+        "y": -16,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "6": {
+        "x": 16,
+        "y": -12,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "7": {
+        "x": 20,
+        "y": -12,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "8": {
+        "x": 24,
+        "y": -12,
+        "dir": 3,
+        "cad": "firme"
+      }
+    },
+    {
+      "0": {
+        "x": 16,
+        "y": -20,
+        "dir": 7,
+        "cad": "firme"
+      },
+      "1": {
+        "x": 20,
+        "y": -20,
+        "dir": 7,
+        "cad": "firme"
+      },
+      "2": {
+        "x": 24,
+        "y": -20,
+        "dir": 7,
+        "cad": "firme"
+      },
+      "3": {
+        "x": 16,
+        "y": -16,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "4": {
+        "x": 20,
+        "y": -16,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "5": {
+        "x": 24,
+        "y": -16,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "6": {
+        "x": 16,
+        "y": -12,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "7": {
+        "x": 20,
+        "y": -12,
+        "dir": 3,
+        "cad": "firme"
+      },
+      "8": {
+        "x": 24,
+        "y": -12,
+        "dir": 3,
+        "cad": "firme"
+      }
+    }
+  ]
+}
