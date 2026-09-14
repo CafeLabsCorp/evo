@@ -1,0 +1,138 @@
+{
+  "nome": "Exemplo — bloco 3x3, avanço com quebra diagonal",
+  "estadoInicial": {
+    "slots": {
+      "0": { "linha": 0, "coluna": 0, "setor": 0, "cadencia": "firme" },
+      "1": { "linha": 0, "coluna": 1, "setor": 0, "cadencia": "firme" },
+      "2": { "linha": 0, "coluna": 2, "setor": 0, "cadencia": "firme" },
+      "3": { "linha": 1, "coluna": 0, "setor": 0, "cadencia": "firme" },
+      "4": { "linha": 1, "coluna": 1, "setor": 0, "cadencia": "firme" },
+      "5": { "linha": 1, "coluna": 2, "setor": 0, "cadencia": "firme" },
+      "6": { "linha": 2, "coluna": 0, "setor": 0, "cadencia": "firme" },
+      "7": { "linha": 2, "coluna": 1, "setor": 0, "cadencia": "firme" },
+      "8": { "linha": 2, "coluna": 2, "setor": 0, "cadencia": "firme" }
+    }
+  },
+  "partes": [
+    {
+      "ordem": 0,
+      "nome": "Marcar passo",
+      "atribuicoes": {
+        "0": { "movimento": { "tipo": "marcarPasso", "tempos": 4 } },
+        "1": { "movimento": { "tipo": "marcarPasso", "tempos": 4 } },
+        "2": { "movimento": { "tipo": "marcarPasso", "tempos": 4 } },
+        "3": { "movimento": { "tipo": "marcarPasso", "tempos": 4 } },
+        "4": { "movimento": { "tipo": "marcarPasso", "tempos": 4 } },
+        "5": { "movimento": { "tipo": "marcarPasso", "tempos": 4 } },
+        "6": { "movimento": { "tipo": "marcarPasso", "tempos": 4 } },
+        "7": { "movimento": { "tipo": "marcarPasso", "tempos": 4 } },
+        "8": { "movimento": { "tipo": "marcarPasso", "tempos": 4 } }
+      }
+    },
+    {
+      "ordem": 1,
+      "nome": "Em frente, marche",
+      "atribuicoes": {
+        "0": { "movimento": { "tipo": "emFrenteMarche", "n": 4, "aoTerminar": "marchando" } },
+        "1": { "movimento": { "tipo": "emFrenteMarche", "n": 4, "aoTerminar": "marchando" } },
+        "2": { "movimento": { "tipo": "emFrenteMarche", "n": 4, "aoTerminar": "marchando" } },
+        "3": { "movimento": { "tipo": "emFrenteMarche", "n": 4, "aoTerminar": "marchando" } },
+        "4": { "movimento": { "tipo": "emFrenteMarche", "n": 4, "aoTerminar": "marchando" } },
+        "5": { "movimento": { "tipo": "emFrenteMarche", "n": 4, "aoTerminar": "marchando" } },
+        "6": { "movimento": { "tipo": "emFrenteMarche", "n": 4, "aoTerminar": "marchando" } },
+        "7": { "movimento": { "tipo": "emFrenteMarche", "n": 4, "aoTerminar": "marchando" } },
+        "8": { "movimento": { "tipo": "emFrenteMarche", "n": 4, "aoTerminar": "marchando" } }
+      }
+    },
+    {
+      "ordem": 2,
+      "nome": "Oitava à direita, em marcha",
+      "atribuicoes": {
+        "0": { "movimento": { "tipo": "oitavaDireitaMarcha" } },
+        "1": { "movimento": { "tipo": "oitavaDireitaMarcha" } },
+        "2": { "movimento": { "tipo": "oitavaDireitaMarcha" } },
+        "3": { "movimento": { "tipo": "oitavaDireitaMarcha" } },
+        "4": { "movimento": { "tipo": "oitavaDireitaMarcha" } },
+        "5": { "movimento": { "tipo": "oitavaDireitaMarcha" } },
+        "6": { "movimento": { "tipo": "oitavaDireitaMarcha" } },
+        "7": { "movimento": { "tipo": "oitavaDireitaMarcha" } },
+        "8": { "movimento": { "tipo": "oitavaDireitaMarcha" } }
+      }
+    },
+    {
+      "ordem": 3,
+      "nome": "Em frente, marche (diagonal)",
+      "atribuicoes": {
+        "0": { "movimento": { "tipo": "emFrenteMarche", "n": 3, "aoTerminar": "marchando" } },
+        "1": { "movimento": { "tipo": "emFrenteMarche", "n": 3, "aoTerminar": "marchando" } },
+        "2": { "movimento": { "tipo": "emFrenteMarche", "n": 3, "aoTerminar": "marchando" } },
+        "3": { "movimento": { "tipo": "emFrenteMarche", "n": 3, "aoTerminar": "marchando" } },
+        "4": { "movimento": { "tipo": "emFrenteMarche", "n": 3, "aoTerminar": "marchando" } },
+        "5": { "movimento": { "tipo": "emFrenteMarche", "n": 3, "aoTerminar": "marchando" } },
+        "6": { "movimento": { "tipo": "emFrenteMarche", "n": 3, "aoTerminar": "marchando" } },
+        "7": { "movimento": { "tipo": "emFrenteMarche", "n": 3, "aoTerminar": "marchando" } },
+        "8": { "movimento": { "tipo": "emFrenteMarche", "n": 3, "aoTerminar": "marchando" } }
+      }
+    },
+    {
+      "ordem": 4,
+      "nome": "Direita volver, em marcha",
+      "atribuicoes": {
+        "0": { "movimento": { "tipo": "direitaVolverMarcha" } },
+        "1": { "movimento": { "tipo": "direitaVolverMarcha" } },
+        "2": { "movimento": { "tipo": "direitaVolverMarcha" } },
+        "3": { "movimento": { "tipo": "direitaVolverMarcha" } },
+        "4": { "movimento": { "tipo": "direitaVolverMarcha" } },
+        "5": { "movimento": { "tipo": "direitaVolverMarcha" } },
+        "6": { "movimento": { "tipo": "direitaVolverMarcha" } },
+        "7": { "movimento": { "tipo": "direitaVolverMarcha" } },
+        "8": { "movimento": { "tipo": "direitaVolverMarcha" } }
+      }
+    },
+    {
+      "ordem": 5,
+      "nome": "Em frente, marche",
+      "atribuicoes": {
+        "0": { "movimento": { "tipo": "emFrenteMarche", "n": 3, "aoTerminar": "marchando" } },
+        "1": { "movimento": { "tipo": "emFrenteMarche", "n": 3, "aoTerminar": "marchando" } },
+        "2": { "movimento": { "tipo": "emFrenteMarche", "n": 3, "aoTerminar": "marchando" } },
+        "3": { "movimento": { "tipo": "emFrenteMarche", "n": 3, "aoTerminar": "marchando" } },
+        "4": { "movimento": { "tipo": "emFrenteMarche", "n": 3, "aoTerminar": "marchando" } },
+        "5": { "movimento": { "tipo": "emFrenteMarche", "n": 3, "aoTerminar": "marchando" } },
+        "6": { "movimento": { "tipo": "emFrenteMarche", "n": 3, "aoTerminar": "marchando" } },
+        "7": { "movimento": { "tipo": "emFrenteMarche", "n": 3, "aoTerminar": "marchando" } },
+        "8": { "movimento": { "tipo": "emFrenteMarche", "n": 3, "aoTerminar": "marchando" } }
+      }
+    },
+    {
+      "ordem": 6,
+      "nome": "Alto",
+      "atribuicoes": {
+        "0": { "movimento": { "tipo": "alto" } },
+        "1": { "movimento": { "tipo": "alto" } },
+        "2": { "movimento": { "tipo": "alto" } },
+        "3": { "movimento": { "tipo": "alto" } },
+        "4": { "movimento": { "tipo": "alto" } },
+        "5": { "movimento": { "tipo": "alto" } },
+        "6": { "movimento": { "tipo": "alto" } },
+        "7": { "movimento": { "tipo": "alto" } },
+        "8": { "movimento": { "tipo": "alto" } }
+      }
+    },
+    {
+      "ordem": 7,
+      "nome": "Fileira da frente meia-volta, resto sentido (simultâneo)",
+      "atribuicoes": {
+        "0": { "movimento": { "tipo": "meiaVoltaParado" } },
+        "1": { "movimento": { "tipo": "meiaVoltaParado" } },
+        "2": { "movimento": { "tipo": "meiaVoltaParado" } },
+        "3": { "movimento": { "tipo": "sentido", "tempos": 1 } },
+        "4": { "movimento": { "tipo": "sentido", "tempos": 1 } },
+        "5": { "movimento": { "tipo": "sentido", "tempos": 1 } },
+        "6": { "movimento": { "tipo": "sentido", "tempos": 1 } },
+        "7": { "movimento": { "tipo": "sentido", "tempos": 1 } },
+        "8": { "movimento": { "tipo": "sentido", "tempos": 1 } }
+      }
+    }
+  ]
+}
