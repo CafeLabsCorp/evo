@@ -1,0 +1,1574 @@
+{
+  "_avisoDadosSinteticos": "AVISO — EVOLUÇÃO SINTÉTICA, NÃO É UMA EVOLUÇÃO REAL DO PELOTÃO. Esta coreografia foi INVENTADA pelo time de desenvolvimento (não pelo Felipe nem pelo pelotão) só para exercitar a infraestrutura de golden test (catálogo, compilador, simulador, checagens e playback) enquanto a evolução real de 21/09 não é digitada. Ela NÃO SUBSTITUI o portão humano de 21/09: aquele portão pergunta 'o Felipe e o pelotão reconhecem isso como uma evolução deles?', e uma coreografia inventada por quem escreveu o motor NÃO PODE responder essa pergunta, por construção — ela só prova que o motor roda, o golden congela e o playback anima, nunca que a coreografia é a que o pelotão de fato vai apresentar. Os nomes 'Alfa', 'Bravo', 'Charlie', 'Delta', 'Echo' são rótulos fictícios de fileira, sem relação com nenhuma pessoa real (o repositório é público). SUBSTITUA ESTE ARQUIVO pela evolução real assim que ela estiver digitada.",
+  "nome": "SINTÉTICA (dev) — bloco 5x5, subgrupos simultâneos + marcha diagonal",
+  "estadoInicial": {
+    "slots": {
+      "0": {
+        "linha": 3,
+        "coluna": 0,
+        "setor": 0,
+        "cadencia": "firme"
+      },
+      "1": {
+        "linha": 3,
+        "coluna": 1,
+        "setor": 0,
+        "cadencia": "firme"
+      },
+      "2": {
+        "linha": 3,
+        "coluna": 2,
+        "setor": 0,
+        "cadencia": "firme"
+      },
+      "3": {
+        "linha": 3,
+        "coluna": 3,
+        "setor": 0,
+        "cadencia": "firme"
+      },
+      "4": {
+        "linha": 3,
+        "coluna": 4,
+        "setor": 0,
+        "cadencia": "firme"
+      },
+      "5": {
+        "linha": 4,
+        "coluna": 0,
+        "setor": 0,
+        "cadencia": "firme"
+      },
+      "6": {
+        "linha": 4,
+        "coluna": 1,
+        "setor": 0,
+        "cadencia": "firme"
+      },
+      "7": {
+        "linha": 4,
+        "coluna": 2,
+        "setor": 0,
+        "cadencia": "firme"
+      },
+      "8": {
+        "linha": 4,
+        "coluna": 3,
+        "setor": 0,
+        "cadencia": "firme"
+      },
+      "9": {
+        "linha": 4,
+        "coluna": 4,
+        "setor": 0,
+        "cadencia": "firme"
+      },
+      "10": {
+        "linha": 5,
+        "coluna": 0,
+        "setor": 0,
+        "cadencia": "firme"
+      },
+      "11": {
+        "linha": 5,
+        "coluna": 1,
+        "setor": 0,
+        "cadencia": "firme"
+      },
+      "12": {
+        "linha": 5,
+        "coluna": 2,
+        "setor": 0,
+        "cadencia": "firme"
+      },
+      "13": {
+        "linha": 5,
+        "coluna": 3,
+        "setor": 0,
+        "cadencia": "firme"
+      },
+      "14": {
+        "linha": 5,
+        "coluna": 4,
+        "setor": 0,
+        "cadencia": "firme"
+      },
+      "15": {
+        "linha": 6,
+        "coluna": 0,
+        "setor": 0,
+        "cadencia": "firme"
+      },
+      "16": {
+        "linha": 6,
+        "coluna": 1,
+        "setor": 0,
+        "cadencia": "firme"
+      },
+      "17": {
+        "linha": 6,
+        "coluna": 2,
+        "setor": 0,
+        "cadencia": "firme"
+      },
+      "18": {
+        "linha": 6,
+        "coluna": 3,
+        "setor": 0,
+        "cadencia": "firme"
+      },
+      "19": {
+        "linha": 6,
+        "coluna": 4,
+        "setor": 0,
+        "cadencia": "firme"
+      },
+      "20": {
+        "linha": 7,
+        "coluna": 0,
+        "setor": 0,
+        "cadencia": "firme"
+      },
+      "21": {
+        "linha": 7,
+        "coluna": 1,
+        "setor": 0,
+        "cadencia": "firme"
+      },
+      "22": {
+        "linha": 7,
+        "coluna": 2,
+        "setor": 0,
+        "cadencia": "firme"
+      },
+      "23": {
+        "linha": 7,
+        "coluna": 3,
+        "setor": 0,
+        "cadencia": "firme"
+      },
+      "24": {
+        "linha": 7,
+        "coluna": 4,
+        "setor": 0,
+        "cadencia": "firme"
+      }
+    }
+  },
+  "partes": [
+    {
+      "ordem": 0,
+      "nome": "Marcar passo (partindo de Sentido)",
+      "atribuicoes": {
+        "0": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 4,
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "1": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 4,
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "2": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 4,
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "3": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 4,
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "4": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 4,
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "5": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 4,
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "6": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 4,
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "7": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 4,
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "8": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 4,
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "9": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 4,
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "10": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 4,
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "11": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 4,
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "12": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 4,
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "13": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 4,
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "14": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 4,
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "15": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 4,
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "16": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 4,
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "17": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 4,
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "18": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 4,
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "19": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 4,
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "20": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 4,
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "21": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 4,
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "22": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 4,
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "23": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 4,
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "24": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 4,
+            "bateRitmoAoJuntar": false
+          }
+        }
+      }
+    },
+    {
+      "ordem": 1,
+      "nome": "Em frente, marche (todos)",
+      "atribuicoes": {
+        "0": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "1": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "2": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "3": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "4": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "5": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "6": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "7": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "8": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "9": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "10": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "11": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "12": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "13": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "14": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "15": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "16": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "17": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "18": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "19": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "20": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "21": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "22": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "23": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "24": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        }
+      }
+    },
+    {
+      "ordem": 2,
+      "nome": "Fileiras simultâneas — Alfa segue marchando, Bravo marca passo (transição), Charlie/Delta/Echo meia-volta em marcha",
+      "atribuicoes": {
+        "0": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "1": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "2": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "3": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "4": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 4,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "5": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 2,
+            "bateRitmoAoJuntar": true
+          },
+          "percussao": { "membro": "mao" }
+        },
+        "6": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 2,
+            "bateRitmoAoJuntar": true
+          },
+          "percussao": { "membro": "mao" }
+        },
+        "7": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 2,
+            "bateRitmoAoJuntar": true
+          },
+          "percussao": { "membro": "mao" }
+        },
+        "8": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 2,
+            "bateRitmoAoJuntar": true
+          },
+          "percussao": { "membro": "mao" }
+        },
+        "9": {
+          "movimento": {
+            "tipo": "marcarPasso",
+            "tempos": 2,
+            "bateRitmoAoJuntar": true
+          },
+          "percussao": { "membro": "mao" }
+        },
+        "10": {
+          "movimento": {
+            "tipo": "meiaVoltaMarcha",
+            "bateRitmoAoJuntar": true
+          },
+          "percussao": { "membro": "pernaEsquerda" }
+        },
+        "11": {
+          "movimento": {
+            "tipo": "meiaVoltaMarcha",
+            "bateRitmoAoJuntar": true
+          },
+          "percussao": { "membro": "pernaEsquerda" }
+        },
+        "12": {
+          "movimento": {
+            "tipo": "meiaVoltaMarcha",
+            "bateRitmoAoJuntar": true
+          },
+          "percussao": { "membro": "pernaEsquerda" }
+        },
+        "13": {
+          "movimento": {
+            "tipo": "meiaVoltaMarcha",
+            "bateRitmoAoJuntar": true
+          },
+          "percussao": { "membro": "pernaEsquerda" }
+        },
+        "14": {
+          "movimento": {
+            "tipo": "meiaVoltaMarcha",
+            "bateRitmoAoJuntar": true
+          },
+          "percussao": { "membro": "pernaEsquerda" }
+        },
+        "15": {
+          "movimento": {
+            "tipo": "meiaVoltaMarcha",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "16": {
+          "movimento": {
+            "tipo": "meiaVoltaMarcha",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "17": {
+          "movimento": {
+            "tipo": "meiaVoltaMarcha",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "18": {
+          "movimento": {
+            "tipo": "meiaVoltaMarcha",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "19": {
+          "movimento": {
+            "tipo": "meiaVoltaMarcha",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "20": {
+          "movimento": {
+            "tipo": "meiaVoltaMarcha",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "21": {
+          "movimento": {
+            "tipo": "meiaVoltaMarcha",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "22": {
+          "movimento": {
+            "tipo": "meiaVoltaMarcha",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "23": {
+          "movimento": {
+            "tipo": "meiaVoltaMarcha",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "24": {
+          "movimento": {
+            "tipo": "meiaVoltaMarcha",
+            "bateRitmoAoJuntar": false
+          }
+        }
+      }
+    },
+    {
+      "ordem": 3,
+      "nome": "Reorganização — Alfa gira oitava à direita em marcha, Bravo fecha marcando passo, Charlie/Delta/Echo retomam a marcha (para o sul)",
+      "atribuicoes": {
+        "0": {
+          "movimento": {
+            "tipo": "oitavaDireitaMarcha",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "1": {
+          "movimento": {
+            "tipo": "oitavaDireitaMarcha",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "2": {
+          "movimento": {
+            "tipo": "oitavaDireitaMarcha",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "3": {
+          "movimento": {
+            "tipo": "oitavaDireitaMarcha",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "4": {
+          "movimento": {
+            "tipo": "oitavaDireitaMarcha",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "5": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 2,
+            "aoTerminar": "marcandoPasso",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "6": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 2,
+            "aoTerminar": "marcandoPasso",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "7": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 2,
+            "aoTerminar": "marcandoPasso",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "8": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 2,
+            "aoTerminar": "marcandoPasso",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "9": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 2,
+            "aoTerminar": "marcandoPasso",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "10": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 2,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "11": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 2,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "12": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 2,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "13": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 2,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "14": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 2,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "15": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 2,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "16": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 2,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "17": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 2,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "18": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 2,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "19": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 2,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "20": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 2,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "21": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 2,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "22": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 2,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "23": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 2,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "24": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 2,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          }
+        }
+      }
+    },
+    {
+      "ordem": 4,
+      "nome": "Marcha diagonal — Alfa segue na diagonal (3 tempos) batendo perna direita; Bravo/Charlie/Delta/Echo continuam o que estavam fazendo (sem atribuição nesta parte)",
+      "atribuicoes": {
+        "0": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 3,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          },
+          "percussao": { "membro": "pernaDireita" }
+        },
+        "1": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 3,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          },
+          "percussao": { "membro": "pernaDireita" }
+        },
+        "2": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 3,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          },
+          "percussao": { "membro": "pernaDireita" }
+        },
+        "3": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 3,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          },
+          "percussao": { "membro": "pernaDireita" }
+        },
+        "4": {
+          "movimento": {
+            "tipo": "emFrenteMarche",
+            "n": 3,
+            "aoTerminar": "marchando",
+            "bateRitmoAoJuntar": false
+          },
+          "percussao": { "membro": "pernaDireita" }
+        }
+      }
+    },
+    {
+      "ordem": 5,
+      "nome": "Alfa retorna à marcha ortogonal (oitava à esquerda); Charlie/Delta/Echo dão Alto (bate só em Charlie); Bravo bate o ritmo",
+      "atribuicoes": {
+        "0": {
+          "movimento": {
+            "tipo": "oitavaEsquerdaMarcha",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "1": {
+          "movimento": {
+            "tipo": "oitavaEsquerdaMarcha",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "2": {
+          "movimento": {
+            "tipo": "oitavaEsquerdaMarcha",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "3": {
+          "movimento": {
+            "tipo": "oitavaEsquerdaMarcha",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "4": {
+          "movimento": {
+            "tipo": "oitavaEsquerdaMarcha",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "10": {
+          "movimento": {
+            "tipo": "alto",
+            "bateRitmoAoJuntar": true
+          }
+        },
+        "11": {
+          "movimento": {
+            "tipo": "alto",
+            "bateRitmoAoJuntar": true
+          }
+        },
+        "12": {
+          "movimento": {
+            "tipo": "alto",
+            "bateRitmoAoJuntar": true
+          }
+        },
+        "13": {
+          "movimento": {
+            "tipo": "alto",
+            "bateRitmoAoJuntar": true
+          }
+        },
+        "14": {
+          "movimento": {
+            "tipo": "alto",
+            "bateRitmoAoJuntar": true
+          }
+        },
+        "15": {
+          "movimento": {
+            "tipo": "alto",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "16": {
+          "movimento": {
+            "tipo": "alto",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "17": {
+          "movimento": {
+            "tipo": "alto",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "18": {
+          "movimento": {
+            "tipo": "alto",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "19": {
+          "movimento": {
+            "tipo": "alto",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "20": {
+          "movimento": {
+            "tipo": "alto",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "21": {
+          "movimento": {
+            "tipo": "alto",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "22": {
+          "movimento": {
+            "tipo": "alto",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "23": {
+          "movimento": {
+            "tipo": "alto",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "24": {
+          "movimento": {
+            "tipo": "alto",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "5": {
+          "movimento": {
+            "tipo": "baterORitmo",
+            "tempos": 2
+          }
+        },
+        "6": {
+          "movimento": {
+            "tipo": "baterORitmo",
+            "tempos": 2
+          }
+        },
+        "7": {
+          "movimento": {
+            "tipo": "baterORitmo",
+            "tempos": 2
+          }
+        },
+        "8": {
+          "movimento": {
+            "tipo": "baterORitmo",
+            "tempos": 2
+          }
+        },
+        "9": {
+          "movimento": {
+            "tipo": "baterORitmo",
+            "tempos": 2
+          }
+        }
+      }
+    },
+    {
+      "ordem": 6,
+      "nome": "Bravo dá Sentido; Charlie gira meia-volta parada com atraso (offset de 2 tempos), Delta/Echo giram de imediato; Alfa mantém-se",
+      "atribuicoes": {
+        "5": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 2
+          }
+        },
+        "6": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 2
+          }
+        },
+        "7": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 2
+          }
+        },
+        "8": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 2
+          }
+        },
+        "9": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 2
+          }
+        },
+        "10": {
+          "movimento": {
+            "tipo": "meiaVoltaParado",
+            "bateRitmoAoJuntar": false
+          },
+          "offsetInicialTiques": 4
+        },
+        "11": {
+          "movimento": {
+            "tipo": "meiaVoltaParado",
+            "bateRitmoAoJuntar": false
+          },
+          "offsetInicialTiques": 4
+        },
+        "12": {
+          "movimento": {
+            "tipo": "meiaVoltaParado",
+            "bateRitmoAoJuntar": false
+          },
+          "offsetInicialTiques": 4
+        },
+        "13": {
+          "movimento": {
+            "tipo": "meiaVoltaParado",
+            "bateRitmoAoJuntar": false
+          },
+          "offsetInicialTiques": 4
+        },
+        "14": {
+          "movimento": {
+            "tipo": "meiaVoltaParado",
+            "bateRitmoAoJuntar": false
+          },
+          "offsetInicialTiques": 4
+        },
+        "15": {
+          "movimento": {
+            "tipo": "meiaVoltaParado",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "16": {
+          "movimento": {
+            "tipo": "meiaVoltaParado",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "17": {
+          "movimento": {
+            "tipo": "meiaVoltaParado",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "18": {
+          "movimento": {
+            "tipo": "meiaVoltaParado",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "19": {
+          "movimento": {
+            "tipo": "meiaVoltaParado",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "20": {
+          "movimento": {
+            "tipo": "meiaVoltaParado",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "21": {
+          "movimento": {
+            "tipo": "meiaVoltaParado",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "22": {
+          "movimento": {
+            "tipo": "meiaVoltaParado",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "23": {
+          "movimento": {
+            "tipo": "meiaVoltaParado",
+            "bateRitmoAoJuntar": false
+          }
+        },
+        "24": {
+          "movimento": {
+            "tipo": "meiaVoltaParado",
+            "bateRitmoAoJuntar": false
+          }
+        }
+      }
+    },
+    {
+      "ordem": 7,
+      "nome": "Sentido geral",
+      "atribuicoes": {
+        "0": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 1
+          }
+        },
+        "1": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 1
+          }
+        },
+        "2": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 1
+          }
+        },
+        "3": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 1
+          }
+        },
+        "4": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 1
+          }
+        },
+        "5": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 1
+          }
+        },
+        "6": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 1
+          }
+        },
+        "7": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 1
+          }
+        },
+        "8": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 1
+          }
+        },
+        "9": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 1
+          }
+        },
+        "10": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 1
+          }
+        },
+        "11": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 1
+          }
+        },
+        "12": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 1
+          }
+        },
+        "13": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 1
+          }
+        },
+        "14": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 1
+          }
+        },
+        "15": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 1
+          }
+        },
+        "16": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 1
+          }
+        },
+        "17": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 1
+          }
+        },
+        "18": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 1
+          }
+        },
+        "19": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 1
+          }
+        },
+        "20": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 1
+          }
+        },
+        "21": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 1
+          }
+        },
+        "22": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 1
+          }
+        },
+        "23": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 1
+          }
+        },
+        "24": {
+          "movimento": {
+            "tipo": "sentido",
+            "tempos": 1
+          }
+        }
+      }
+    },
+    {
+      "ordem": 8,
+      "nome": "Descansar (fim da evolução)",
+      "atribuicoes": {
+        "0": {
+          "movimento": {
+            "tipo": "descansar",
+            "tempos": 2
+          }
+        },
+        "1": {
+          "movimento": {
+            "tipo": "descansar",
+            "tempos": 2
+          }
+        },
+        "2": {
+          "movimento": {
+            "tipo": "descansar",
+            "tempos": 2
+          }
+        },
+        "3": {
+          "movimento": {
+            "tipo": "descansar",
+            "tempos": 2
+          }
+        },
+        "4": {
+          "movimento": {
+            "tipo": "descansar",
+            "tempos": 2
+          }
+        },
+        "5": {
+          "movimento": {
+            "tipo": "descansar",
+            "tempos": 2
+          }
+        },
+        "6": {
+          "movimento": {
+            "tipo": "descansar",
+            "tempos": 2
+          }
+        },
+        "7": {
+          "movimento": {
+            "tipo": "descansar",
+            "tempos": 2
+          }
+        },
+        "8": {
+          "movimento": {
+            "tipo": "descansar",
+            "tempos": 2
+          }
+        },
+        "9": {
+          "movimento": {
+            "tipo": "descansar",
+            "tempos": 2
+          }
+        },
+        "10": {
+          "movimento": {
+            "tipo": "descansar",
+            "tempos": 2
+          }
+        },
+        "11": {
+          "movimento": {
+            "tipo": "descansar",
+            "tempos": 2
+          }
+        },
+        "12": {
+          "movimento": {
+            "tipo": "descansar",
+            "tempos": 2
+          }
+        },
+        "13": {
+          "movimento": {
+            "tipo": "descansar",
+            "tempos": 2
+          }
+        },
+        "14": {
+          "movimento": {
+            "tipo": "descansar",
+            "tempos": 2
+          }
+        },
+        "15": {
+          "movimento": {
+            "tipo": "descansar",
+            "tempos": 2
+          }
+        },
+        "16": {
+          "movimento": {
+            "tipo": "descansar",
+            "tempos": 2
+          }
+        },
+        "17": {
+          "movimento": {
+            "tipo": "descansar",
+            "tempos": 2
+          }
+        },
+        "18": {
+          "movimento": {
+            "tipo": "descansar",
+            "tempos": 2
+          }
+        },
+        "19": {
+          "movimento": {
+            "tipo": "descansar",
+            "tempos": 2
+          }
+        },
+        "20": {
+          "movimento": {
+            "tipo": "descansar",
+            "tempos": 2
+          }
+        },
+        "21": {
+          "movimento": {
+            "tipo": "descansar",
+            "tempos": 2
+          }
+        },
+        "22": {
+          "movimento": {
+            "tipo": "descansar",
+            "tempos": 2
+          }
+        },
+        "23": {
+          "movimento": {
+            "tipo": "descansar",
+            "tempos": 2
+          }
+        },
+        "24": {
+          "movimento": {
+            "tipo": "descansar",
+            "tempos": 2
+          }
+        }
+      }
+    }
+  ]
+}
