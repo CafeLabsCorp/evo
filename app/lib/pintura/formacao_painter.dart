@@ -16,6 +16,30 @@ const Color _corGradePonto = Paleta.gradePonto;
 const Color _corFundo = Paleta.fundo;
 const Color _corDestaque = Paleta.acento;
 
+/// Regra de PRECEDÊNCIA de pintura para um conjunto de [TipoBatida] ativos
+/// no mesmo tique: percussão sobrepõe passo. Motivo geométrico, não de
+/// prioridade semântica — a janela segura de raio (`17,03..18,97px` na
+/// célula de referência) cabe UM anel, não dois concêntricos (ver
+/// `FormacaoPainter._desenharAnelDestaque`). O motor guarda os dois no
+/// [EstadoRenderizado.batidas] (áudio futuro toca os dois); só a pintura
+/// colapsa aqui.
+///
+/// Função pura — sem `Canvas` — de propósito: é o que permite testar a
+/// regra (conjunto de entrada → o que desenhar) sem golden de pixel.
+/// Devolve `null` quando não há nada para desenhar.
+@visibleForTesting
+TipoBatida? tipoBatidaParaDesenhar(Set<TipoBatida> batidas) {
+  for (final TipoBatida percussao in <TipoBatida>[
+    TipoBatida.mao,
+    TipoBatida.pernaDireita,
+    TipoBatida.pernaEsquerda,
+  ]) {
+    if (batidas.contains(percussao)) return percussao;
+  }
+  if (batidas.contains(TipoBatida.passo)) return TipoBatida.passo;
+  return null;
+}
+
 /// Glifo vetorial do badge de cadência — desenhado com [Path]/[Canvas.drawLine]
 /// diretamente, nunca com `ui.ParagraphBuilder` (texto de fonte). Tamanho de
 /// fonte não dá controle de proporção confiável num ícone de poucos pixels:
@@ -299,12 +323,19 @@ class FormacaoPainter extends CustomPainter {
 
     canvas.restore();
 
-    // Anel de destaque de batida e badge de cadência são desenhados FORA
-    // do referencial rotacionado, de propósito: precisam continuar
+    // Anel/arco de destaque de batida e badge de cadência são desenhados
+    // FORA do referencial rotacionado, de propósito: precisam continuar
     // legíveis (e, no caso do anel, geometricamente corretos — um círculo
-    // não muda com rotação, mas manter o cálculo fora do `save`/`restore`
-    // deixa isso explícito) não importa o facing atual.
-    if (e.destacado) _desenharAnelDestaque(canvas, centro);
+    // não muda com rotação) não importa o facing atual. O arco de
+    // percussão É relativo ao facing (ver [tipoBatidaParaDesenhar] e
+    // [_desenharArcoPercussao]), mas o cálculo do ângulo já incorpora
+    // `e.anguloGraus` explicitamente — não depende do `save`/`restore`.
+    final TipoBatida? destaque = tipoBatidaParaDesenhar(e.batidas);
+    if (destaque == TipoBatida.passo) {
+      _desenharAnelDestaque(canvas, centro);
+    } else if (destaque != null) {
+      _desenharArcoPercussao(canvas, centro, destaque, e.anguloGraus);
+    }
     _desenharBadgeCadencia(canvas, centro, estilo);
   }
 
@@ -347,6 +378,61 @@ class FormacaoPainter extends CustomPainter {
       ..strokeWidth = _escalar(2)
       ..color = _corDestaque;
     canvas.drawCircle(centro, _escalar(18), anel);
+  }
+
+  /// Destaque de PERCUSSÃO: arco de 120°, mesmo raio do anel de passo
+  /// (`_escalar(18)`), mas no referencial do CORPO — gira com o facing,
+  /// ao contrário do badge de cadência (fixo em tela). "Perna esquerda" é
+  /// egocêntrico: um arco fixo mostraria a batida do lado errado assim
+  /// que a pessoa virasse.
+  ///
+  /// Diferenciação por GEOMETRIA (posição do arco ao redor do corpo),
+  /// nunca por cor nem por glifo — a paleta acabou de ser fechada (ver
+  /// `tema/paleta.dart`) e introduzir um matiz novo por membro duplicaria
+  /// canal de codificação sem necessidade:
+  /// - `mao` → centrado à frente do corpo.
+  /// - `pernaDireita` → centrado no lado direito.
+  /// - `pernaEsquerda` → centrado no lado esquerdo.
+  ///
+  /// As três posições (e os dois pisos de stroke/raio) são calibradas
+  /// contra a mesma janela seguro documentada em [_desenharAnelDestaque]
+  /// (17,03..18,97px na célula de referência de 36px): o arco nunca
+  /// ultrapassa `_escalar(18)` de raio, e o stroke nunca cai abaixo de
+  /// 1,5px (piso absoluto — `_escalar(2)` puro vira <1px no piso da
+  /// escala e some).
+  void _desenharArcoPercussao(
+    Canvas canvas,
+    Offset centro,
+    TipoBatida tipo,
+    double anguloGraus,
+  ) {
+    // `anguloGraus` é o facing no referencial "compasso" do app (0 =
+    // Norte, horário) — o MESMO usado por `canvas.rotate` na silhueta.
+    // `Canvas.drawArc`, por outro lado, mede a partir do eixo +X (Leste)
+    // — daí o "-90" embutido no caso `mao` (que fica alinhada com o
+    // próprio facing): os três casos abaixo já estão no referencial que
+    // `drawArc` espera, não precisam de conversão extra aqui.
+    final double centroGraus = switch (tipo) {
+      TipoBatida.mao => anguloGraus - 90,
+      TipoBatida.pernaDireita => anguloGraus,
+      TipoBatida.pernaEsquerda => anguloGraus + 180,
+      TipoBatida.passo => anguloGraus, // nunca chamado com passo.
+    };
+    final double startGraus = centroGraus - 60;
+    const double sweepGraus = 120;
+
+    final Paint arco = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = math.max(_escalar(2), 1.5)
+      ..strokeCap = StrokeCap.round
+      ..color = _corDestaque;
+    canvas.drawArc(
+      Rect.fromCircle(center: centro, radius: _escalar(18)),
+      grausParaRadianos(startGraus),
+      grausParaRadianos(sweepGraus),
+      false,
+      arco,
+    );
   }
 
   /// Badge de cadência: círculo escuro fixo (nunca muda de cor com a

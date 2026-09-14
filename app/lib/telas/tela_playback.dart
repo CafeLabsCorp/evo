@@ -261,6 +261,7 @@ class _Controles extends StatelessWidget {
             _SeletorModo(controlador: controlador),
             const SizedBox(height: 8),
             _FaixaBolinhas(controlador: controlador),
+            _LegendaPercussao(controlador: controlador),
             const SizedBox(height: 8),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -469,6 +470,114 @@ class _FaixaBolinhas extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Legenda em TEXTO de qual membro (mão/perna esquerda/perna direita) está
+/// atribuído a cada grupo de slots na parte atualmente em reprodução (ou
+/// selecionada, se pausado fora de qualquer parte). Existe porque, no piso
+/// de escala de 18px, a posição do arco é a única pista visual — e
+/// distinguir `pernaEsquerda` de `pernaDireita` só pela geometria exigiria
+/// ler o facing de uma silhueta de 11px, o que não é realista. O texto
+/// nunca substitui a codificação geométrica (ver `_desenharArcoPercussao`
+/// em `formacao_painter.dart`); só complementa.
+///
+/// Some por completo (`SizedBox.shrink`) quando a parte não tem NENHUMA
+/// percussão atribuída — não vira uma faixa vazia ocupando espaço à toa.
+class _LegendaPercussao extends StatelessWidget {
+  const _LegendaPercussao({required this.controlador});
+  final ControladorPlayback controlador;
+
+  /// `FaixaParte.indiceParte` é a posição na lista de partes JÁ ORDENADA
+  /// por `ordem` (ver `simular`) — não necessariamente a posição em
+  /// `evolucao.partes` (a ordem de declaração no JSON). Replicamos a mesma
+  /// ordenação aqui para indexar com segurança pelo índice do playback.
+  List<Parte> get _partesOrdenadas {
+    final List<Parte> copia = List<Parte>.of(
+      controlador.pacote.evolucao.partes,
+    )..sort((Parte a, Parte b) => a.ordem.compareTo(b.ordem));
+    return copia;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final int? indice =
+        controlador.indiceParteEmReproducao ??
+        controlador.indiceParteSelecionada;
+    if (indice == null) return const SizedBox.shrink();
+
+    final List<Parte> partes = _partesOrdenadas;
+    if (indice < 0 || indice >= partes.length) return const SizedBox.shrink();
+
+    final Map<MembroPercussao, List<int>> slotsPorMembro =
+        <MembroPercussao, List<int>>{};
+    for (final MapEntry<int, Atribuicao> entrada
+        in partes[indice].atribuicoes.entries) {
+      final Percussao? percussao = entrada.value.percussao;
+      if (percussao == null) continue;
+      slotsPorMembro
+          .putIfAbsent(percussao.membro, () => <int>[])
+          .add(entrada.key);
+    }
+    if (slotsPorMembro.isEmpty) return const SizedBox.shrink();
+
+    final List<MembroPercussao> ordemMembros = <MembroPercussao>[
+      MembroPercussao.mao,
+      MembroPercussao.pernaEsquerda,
+      MembroPercussao.pernaDireita,
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 4, bottom: 4),
+      child: Wrap(
+        spacing: 12,
+        runSpacing: 4,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: <Widget>[
+          const Icon(
+            Icons.pan_tool_alt_outlined,
+            size: 16,
+            color: Paleta.cinzaMedio,
+          ),
+          for (final MembroPercussao membro in ordemMembros)
+            if (slotsPorMembro[membro] case final List<int> slots?)
+              Text(
+                '${_rotuloMembro(membro)}: ${_rotuloSlots(slots)}',
+                style: const TextStyle(
+                  color: Paleta.claro,
+                  fontSize: 12,
+                ),
+              ),
+        ],
+      ),
+    );
+  }
+}
+
+String _rotuloMembro(MembroPercussao membro) => switch (membro) {
+  MembroPercussao.mao => 'mão',
+  MembroPercussao.pernaEsquerda => 'perna esquerda',
+  MembroPercussao.pernaDireita => 'perna direita',
+};
+
+/// Compacta uma lista de slots em faixas contíguas ("5–9, 12") — mais legível
+/// que listar cada número quando o pelotão inteiro (ou um subgrupo grande)
+/// compartilha o mesmo membro.
+String _rotuloSlots(List<int> slots) {
+  final List<int> ordenados = List<int>.of(slots)..sort();
+  final List<String> faixas = <String>[];
+  int inicio = ordenados.first;
+  int fim = ordenados.first;
+  for (int i = 1; i <= ordenados.length; i++) {
+    if (i < ordenados.length && ordenados[i] == fim + 1) {
+      fim = ordenados[i];
+      continue;
+    }
+    faixas.add(inicio == fim ? '$inicio' : '$inicio–$fim');
+    if (i < ordenados.length) {
+      inicio = fim = ordenados[i];
+    }
+  }
+  return faixas.join(', ');
 }
 
 class _Bolinha extends StatelessWidget {

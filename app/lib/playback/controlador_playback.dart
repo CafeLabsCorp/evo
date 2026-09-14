@@ -16,7 +16,7 @@ class EstadoRenderizado {
     required this.coluna,
     required this.anguloGraus,
     required this.cadencia,
-    required this.destacado,
+    required this.batidas,
   });
 
   final int slot;
@@ -25,9 +25,13 @@ class EstadoRenderizado {
   final double anguloGraus;
   final Cadencia cadencia;
 
-  /// `true` por uma janela curta ao redor de uma batida de ritmo — pulso
-  /// visual simples, sem áudio na v1.
-  final bool destacado;
+  /// [TipoBatida]s ativos numa janela curta ao redor do tique atual — pulso
+  /// visual simples, sem áudio na v1. Pode conter mais de um tipo ao mesmo
+  /// tempo (ex.: `passo` de `bateRitmoAoJuntar` + percussão no mesmo
+  /// tique) — é o painter que decide a precedência de PINTURA (ver
+  /// `tipoBatidaParaDesenhar` em `formacao_painter.dart`); o motor e este
+  /// controlador guardam o conjunto inteiro, sem descartar nada.
+  final Set<TipoBatida> batidas;
 }
 
 /// Controla o playback de uma [PacoteEvolucao]: play/pause, velocidade,
@@ -46,11 +50,22 @@ class ControladorPlayback extends ChangeNotifier {
       ...pacote.resultado.porTique,
     ];
     _eventosPorSlot = <int, List<EventoRotacao>>{};
+    _batidasPorSlotETique = <int, Map<int, Set<TipoBatida>>>{};
     for (final Evento evento in pacote.resultado.eventos) {
-      if (evento is EventoRotacao) {
-        _eventosPorSlot
-            .putIfAbsent(evento.slot, () => <EventoRotacao>[])
-            .add(evento);
+      switch (evento) {
+        case EventoRotacao():
+          _eventosPorSlot
+              .putIfAbsent(evento.slot, () => <EventoRotacao>[])
+              .add(evento);
+        case EventoBatida(:final int slot, :final int tiqueGlobal, :final TipoBatida tipo):
+          // Indexado por slot E por tique (não uma varredura linear de
+          // TODOS os eventos por frame): com percussão o volume de
+          // eventos vai de dezenas para T/2 × slots, e este mapa é
+          // montado uma vez aqui, nunca recalculado em `_batidasPerto`.
+          _batidasPorSlotETique
+              .putIfAbsent(slot, () => <int, Set<TipoBatida>>{})
+              .putIfAbsent(tiqueGlobal, () => <TipoBatida>{})
+              .add(tipo);
       }
     }
     _ticker = vsync.createTicker(_aoTicar);
@@ -61,6 +76,11 @@ class ControladorPlayback extends ChangeNotifier {
 
   late final List<EstadoFormacao> _combinados; // [inicial, ...porTique]
   late Map<int, List<EventoRotacao>> _eventosPorSlot;
+
+  /// slot -> tique global -> conjunto de [TipoBatida] batidos naquele
+  /// tique exato. Montado uma única vez no construtor (ver acima) —
+  /// `_batidasPerto` só consulta, nunca varre `pacote.resultado.eventos`.
+  late Map<int, Map<int, Set<TipoBatida>>> _batidasPorSlotETique;
   late final Ticker _ticker;
   Duration _ultimoTique = Duration.zero;
 
@@ -281,7 +301,7 @@ class ControladorPlayback extends ChangeNotifier {
       final double coluna = colunaA + (colunaB - colunaA) * fracao;
 
       final double angulo = _anguloInterpolado(slot, t, a.dir);
-      final bool destacado = _temBatidaPerto(slot, t);
+      final Set<TipoBatida> batidas = _batidasPerto(slot, t);
 
       resultado.add(
         EstadoRenderizado(
@@ -290,7 +310,7 @@ class ControladorPlayback extends ChangeNotifier {
           coluna: coluna,
           anguloGraus: angulo,
           cadencia: fracao < 0.5 ? a.cad : b.cad,
-          destacado: destacado,
+          batidas: batidas,
         ),
       );
     }
@@ -314,13 +334,23 @@ class ControladorPlayback extends ChangeNotifier {
     return direcaoDiscretaAtual * 45.0;
   }
 
-  bool _temBatidaPerto(int slot, double t) {
-    for (final Evento evento in pacote.resultado.eventos) {
-      if (evento is EventoBatida && evento.slot == slot) {
-        if ((evento.tiqueGlobal - t).abs() < 0.5) return true;
-      }
+  /// Conjunto de [TipoBatida] "por perto" do tique fracionário [t] (mesma
+  /// janela de sempre, raio 0,5 tique) para um [slot] — consulta o índice
+  /// montado no construtor, nunca varre a lista de eventos por frame. A
+  /// janela tem largura 1, então só os dois inteiros mais próximos de [t]
+  /// (`floor`/`ceil`) podem cair dentro dela; checar qualquer outro tique
+  /// seria trabalho desperdiçado.
+  Set<TipoBatida> _batidasPerto(int slot, double t) {
+    final Map<int, Set<TipoBatida>>? porTique = _batidasPorSlotETique[slot];
+    if (porTique == null || porTique.isEmpty) return const <TipoBatida>{};
+
+    final Set<TipoBatida> resultado = <TipoBatida>{};
+    for (final int candidato in <int>{t.floor(), t.ceil()}) {
+      if ((candidato - t).abs() >= 0.5) continue;
+      final Set<TipoBatida>? tipos = porTique[candidato];
+      if (tipos != null) resultado.addAll(tipos);
     }
-    return false;
+    return resultado;
   }
 
   @override
