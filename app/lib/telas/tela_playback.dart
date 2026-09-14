@@ -128,13 +128,14 @@ class _CorpoPlayback extends StatelessWidget {
                 color: PaletaProvisoria.fundo,
                 child: Center(
                   child: AspectRatio(
-                    aspectRatio: controlador.pacote.resultado.porTique.isEmpty
-                        ? 1
-                        : _aspecto(controlador),
+                    aspectRatio: _aspecto(controlador),
                     child: CustomPaint(
                       painter: FormacaoPainter(
                         estados: controlador.estadosRenderizados(),
                         campo: const Campo(),
+                        enquadramento: controlador.enquadramentoCelulas,
+                        mostrarLinhas: controlador.mostrarLinhasGrade,
+                        mostrarPontos: controlador.mostrarPontosGrade,
                       ),
                     ),
                   ),
@@ -148,9 +149,22 @@ class _CorpoPlayback extends StatelessWidget {
     );
   }
 
+  /// Proporção do retângulo de desenho — casada com o CONTEÚDO enquadrado
+  /// (bounding box da faixa em reprodução + a mesma margem que
+  /// [FormacaoPainter] usa internamente), não com o campo 20×20 inteiro.
+  /// Antes disto, a área de desenho era sempre quadrada (proporção do
+  /// campo default) e o [FormacaoPainter] "sobrava" espaço nos dois lados
+  /// do eixo mais curto pra manter a escala uniforme — funcionalmente
+  /// correto (nada cortado), mas desperdiçava tela à toa numa evolução
+  /// claramente não-quadrada (ex.: uma faixa alta e estreita). Casar a
+  /// proporção aqui faz a mesma escala preencher o retângulo inteiro.
   double _aspecto(ControladorPlayback c) {
-    final Campo campo = const Campo();
-    return campo.larguraCelulas / campo.alturaCelulas;
+    if (c.pacote.resultado.porTique.isEmpty) return 1;
+    final Rect caixa = c.enquadramentoCelulas.inflate(
+      FormacaoPainter.margemCelulas,
+    );
+    if (caixa.width <= 0 || caixa.height <= 0) return 1;
+    return caixa.width / caixa.height;
   }
 }
 
@@ -240,6 +254,7 @@ class _Controles extends StatelessWidget {
                   'tique ${controlador.tiqueAtual.round()}',
                   style: const TextStyle(color: PaletaProvisoria.claro),
                 ),
+                _BotaoOpcoesGrade(controlador: controlador),
               ],
             ),
             const SizedBox(height: 8),
@@ -287,6 +302,78 @@ class _Controles extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Botão que abre as opções de grade (linhas/pontos) num bottom sheet, em
+/// vez de uma linha própria nos controles — pedido de 2026-09-14 foi por
+/// dois switches independentes, mas a barra de controles do retrato de
+/// celular já está cheia (play/slider, seletor de modo, fileira de partes,
+/// velocidade); um menu evita competir por espaço vertical com a vista de
+/// cima, que é o que importa ver. Cabe na mesma linha do play/slider, sem
+/// aumentar a altura da barra.
+class _BotaoOpcoesGrade extends StatelessWidget {
+  const _BotaoOpcoesGrade({required this.controlador});
+  final ControladorPlayback controlador;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      tooltip: 'Opções de grade',
+      iconSize: 28,
+      color: PaletaProvisoria.claro,
+      icon: const Icon(Icons.grid_on),
+      onPressed: () => _abrirOpcoes(context),
+    );
+  }
+
+  void _abrirOpcoes(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: PaletaProvisoria.superficie,
+      builder: (BuildContext context) {
+        return AnimatedBuilder(
+          animation: controlador,
+          builder: (BuildContext context, Widget? child) {
+            return SafeArea(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  const Padding(
+                    padding: EdgeInsets.only(top: 12, bottom: 4),
+                    child: Text(
+                      'Grade',
+                      style: TextStyle(
+                        color: PaletaProvisoria.claro,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  SwitchListTile(
+                    title: const Text(
+                      'Linhas',
+                      style: TextStyle(color: PaletaProvisoria.claro),
+                    ),
+                    activeThumbColor: PaletaProvisoria.acento,
+                    value: controlador.mostrarLinhasGrade,
+                    onChanged: controlador.alternarLinhasGrade,
+                  ),
+                  SwitchListTile(
+                    title: const Text(
+                      'Pontos',
+                      style: TextStyle(color: PaletaProvisoria.claro),
+                    ),
+                    activeThumbColor: PaletaProvisoria.acento,
+                    value: controlador.mostrarPontosGrade,
+                    onChanged: controlador.alternarPontosGrade,
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

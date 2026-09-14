@@ -92,10 +92,30 @@ class ControladorPlayback extends ChangeNotifier {
   double _velocidadeTiquesPorSegundo = velocidadeBase1xTiquesPorSegundo;
   bool _tocando = false;
 
+  /// Visibilidade das linhas e dos pontos do grid — dois toggles
+  /// independentes a pedido de 2026-09-14 ("os quadradinhos ficaram
+  /// horríveis de ver"): as linhas competiam com o conteúdo. Padrão pedido:
+  /// pontos ligados, linhas desligadas. Os quatro estados são válidos,
+  /// inclusive ambos desligados (fundo limpo).
+  bool _mostrarLinhasGrade = false;
+  bool _mostrarPontosGrade = true;
+
   int? get indiceParteSelecionada => _indiceParteSelecionada;
   double get tiqueAtual => _tiqueAtual;
   bool get tocando => _tocando;
   double get velocidadeTiquesPorSegundo => _velocidadeTiquesPorSegundo;
+  bool get mostrarLinhasGrade => _mostrarLinhasGrade;
+  bool get mostrarPontosGrade => _mostrarPontosGrade;
+
+  void alternarLinhasGrade(bool valor) {
+    _mostrarLinhasGrade = valor;
+    notifyListeners();
+  }
+
+  void alternarPontosGrade(bool valor) {
+    _mostrarPontosGrade = valor;
+    notifyListeners();
+  }
 
   int get tiqueInicioFaixa => _indiceParteSelecionada == null
       ? 0
@@ -111,7 +131,51 @@ class ControladorPlayback extends ChangeNotifier {
     pausar();
     _indiceParteSelecionada = indiceParte;
     _tiqueAtual = tiqueInicioFaixa.toDouble();
+    _enquadramentoCelulas = _calcularEnquadramento();
     notifyListeners();
+  }
+
+  /// Bounding box (linha/coluna, em células, sem margem) de todas as
+  /// posições ocupadas por qualquer slot em qualquer tique da faixa
+  /// ATUALMENTE SELECIONADA (evolução completa ou parte isolada, conforme
+  /// [indiceParteSelecionada]) — não só do tique corrente. Recalculado uma
+  /// vez por seleção de faixa (em [definirFaixa]), nunca a cada frame: o
+  /// enquadramento é sobre TODA a faixa de propósito, então não muda
+  /// tique a tique — recalcular a cada frame só custaria CPU à toa e,
+  /// pior, se algum dia passar a depender só do tique atual, o
+  /// enquadramento pularia a cada passo do playback (pior que o bug que
+  /// isto corrige). [FormacaoPainter] decide separadamente margem e
+  /// teto/piso de escala em cima deste retângulo — aqui é só "quais
+  /// células a evolução usa".
+  Rect get enquadramentoCelulas => _enquadramentoCelulas;
+  late Rect _enquadramentoCelulas;
+
+  Rect _calcularEnquadramento() {
+    double minLinha = 0, maxLinha = 0, minColuna = 0, maxColuna = 0;
+    bool primeiro = true;
+    final int fim = tiqueFimFaixa.clamp(0, _combinados.length - 1);
+    for (int t = tiqueInicioFaixa; t <= fim; t++) {
+      for (final int slot in _combinados[t].slots) {
+        final (double linha, double coluna) = _combinados[t][slot].posicao
+            .emCelulas();
+        if (primeiro) {
+          minLinha = maxLinha = linha;
+          minColuna = maxColuna = coluna;
+          primeiro = false;
+        } else {
+          if (linha < minLinha) minLinha = linha;
+          if (linha > maxLinha) maxLinha = linha;
+          if (coluna < minColuna) minColuna = coluna;
+          if (coluna > maxColuna) maxColuna = coluna;
+        }
+      }
+    }
+    // `primeiro` continuar `true` significaria uma faixa sem nenhum slot —
+    // não acontece em v1 (toda formação tem pelo menos um slot o tempo
+    // todo), mas cai num retângulo degenerado em vez de propagar um erro
+    // de enquadramento pra fora do que é, na pior hipótese, um detalhe
+    // visual.
+    return Rect.fromLTRB(minColuna, minLinha, maxColuna, maxLinha);
   }
 
   /// Índice da parte que contém o tique atual do playhead — usado só pra
