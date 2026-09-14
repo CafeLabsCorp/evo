@@ -17,6 +17,27 @@ papel quadriculado e na cabeça do instrutor:
 Em desenvolvimento. O motor e o playback estão de pé; o editor, a persistência
 e a colaboração ainda não.
 
+### Validação
+
+O projeto tem um portão de reconhecimento: o playback só serve para alguma
+coisa se quem pratica ordem unida olhar a animação e reconhecer o que está
+vendo. Ele é feito em duas metades.
+
+- **Metade 1 — a animação lê como ordem unida?** *Passou (14/09/2026).* O
+  playback de uma evolução sintética foi mostrado a membros de um pelotão
+  especial, e a reação foi de reconhecimento. Isso retira o risco mais barato
+  de se descobrir tarde: que o modelo discreto, a granularidade de passo ou a
+  convenção de giro estivessem sutilmente errados. Nenhuma propriedade
+  automática do motor consegue pegar esse erro — todas são relativas e
+  fechariam igual numa geometria espelhada.
+- **Metade 2 — é uma evolução *deles*?** *Pendente.* Exige uma coreografia real
+  do pelotão, não uma inventada por quem escreveu o motor. Uma evolução
+  sintética não pode responder essa pergunta, por construção.
+
+O sucesso do produto não é medido por nenhuma das duas: é medido por o
+instrutor planejar no app em vez de no papel, e voltar ao papel conta como
+falha. Entusiasmo de quem assiste é sinal, não uso.
+
 ## Estrutura
 
 ```
