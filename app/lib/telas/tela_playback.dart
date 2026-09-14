@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../modelo/carregador_evolucao.dart';
 import '../playback/controlador_playback.dart';
 import '../pintura/formacao_painter.dart';
-import '../tema/paleta_provisoria.dart';
+import '../tema/paleta.dart';
 
 /// Tela única do v1: carrega o JSON de exemplo, simula, e mostra o
 /// playback. Os três estados que importam aqui não são
@@ -63,7 +63,7 @@ class _TelaPlaybackState extends State<TelaPlayback>
               if (snapshot.connectionState != ConnectionState.done) {
                 return const Center(
                   child: CircularProgressIndicator(
-                    color: PaletaProvisoria.claro,
+                    color: Paleta.claro,
                   ),
                 );
               }
@@ -93,7 +93,7 @@ class _ErroCarregamento extends StatelessWidget {
           children: <Widget>[
             const Icon(
               Icons.error_outline,
-              color: PaletaProvisoria.erro,
+              color: Paleta.erro,
               size: 48,
             ),
             const SizedBox(height: 12),
@@ -125,7 +125,7 @@ class _CorpoPlayback extends StatelessWidget {
               _FaixaDiagnosticos(pacote: controlador.pacote),
             Expanded(
               child: Container(
-                color: PaletaProvisoria.fundo,
+                color: Paleta.fundo,
                 child: Center(
                   child: AspectRatio(
                     aspectRatio: _aspecto(controlador),
@@ -176,19 +176,19 @@ class _FaixaDiagnosticos extends StatelessWidget {
   Widget build(BuildContext context) {
     final int n = pacote.diagnosticosDeErro.length;
     return Material(
-      color: PaletaProvisoria.erroSuperficie,
+      color: Paleta.erroSuperficie,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Row(
           children: <Widget>[
-            const Icon(Icons.warning_amber_rounded, color: PaletaProvisoria.acento),
+            const Icon(Icons.warning_amber_rounded, color: Paleta.acento),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 '$n diagnóstico(s) de erro nesta evolução — a animação segue completa '
                 '(com a continuação implícita nos slots afetados), mas confira antes '
                 'de levar pro campo.',
-                style: const TextStyle(color: PaletaProvisoria.claro),
+                style: const TextStyle(color: Paleta.claro),
               ),
             ),
           ],
@@ -217,7 +217,7 @@ class _Controles extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       elevation: 4,
-      color: PaletaProvisoria.superficie,
+      color: Paleta.superficie,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Column(
@@ -227,7 +227,7 @@ class _Controles extends StatelessWidget {
               children: <Widget>[
                 IconButton(
                   iconSize: 36,
-                  color: PaletaProvisoria.claro,
+                  color: Paleta.claro,
                   icon: Icon(
                     controlador.tocando
                         ? Icons.pause_circle_filled
@@ -237,8 +237,8 @@ class _Controles extends StatelessWidget {
                 ),
                 Expanded(
                   child: Slider(
-                    activeColor: PaletaProvisoria.acento,
-                    inactiveColor: PaletaProvisoria.cinzaMedio.withValues(
+                    activeColor: Paleta.acento,
+                    inactiveColor: Paleta.cinzaMedio.withValues(
                       alpha: 0.3,
                     ),
                     min: controlador.tiqueInicioFaixa.toDouble(),
@@ -252,7 +252,7 @@ class _Controles extends StatelessWidget {
                 ),
                 Text(
                   'tique ${controlador.tiqueAtual.round()}',
-                  style: const TextStyle(color: PaletaProvisoria.claro),
+                  style: const TextStyle(color: Paleta.claro),
                 ),
                 _BotaoOpcoesGrade(controlador: controlador),
               ],
@@ -268,7 +268,7 @@ class _Controles extends StatelessWidget {
                 children: <Widget>[
                   const Text(
                     'Velocidade',
-                    style: TextStyle(color: PaletaProvisoria.claro),
+                    style: TextStyle(color: Paleta.claro),
                   ),
                   const SizedBox(width: 8),
                   ..._multiplicadoresVelocidade.map(
@@ -281,12 +281,12 @@ class _Controles extends StatelessWidget {
                             m *
                                 ControladorPlayback
                                     .velocidadeBase1xTiquesPorSegundo,
-                        selectedColor: PaletaProvisoria.acento.withValues(
+                        selectedColor: Paleta.acento.withValues(
                           alpha: 0.35,
                         ),
-                        backgroundColor: PaletaProvisoria.cinzaEscuro,
+                        backgroundColor: Paleta.cinzaEscuro,
                         labelStyle: const TextStyle(
-                          color: PaletaProvisoria.claro,
+                          color: Paleta.claro,
                         ),
                         onSelected: (_) => controlador.definirVelocidade(
                           m *
@@ -322,7 +322,7 @@ class _BotaoOpcoesGrade extends StatelessWidget {
     return IconButton(
       tooltip: 'Opções de grade',
       iconSize: 28,
-      color: PaletaProvisoria.claro,
+      color: Paleta.claro,
       icon: const Icon(Icons.grid_on),
       onPressed: () => _abrirOpcoes(context),
     );
@@ -331,7 +331,7 @@ class _BotaoOpcoesGrade extends StatelessWidget {
   void _abrirOpcoes(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: PaletaProvisoria.superficie,
+      backgroundColor: Paleta.superficie,
       builder: (BuildContext context) {
         return AnimatedBuilder(
           animation: controlador,
@@ -345,7 +345,7 @@ class _BotaoOpcoesGrade extends StatelessWidget {
                     child: Text(
                       'Grade',
                       style: TextStyle(
-                        color: PaletaProvisoria.claro,
+                        color: Paleta.claro,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -353,18 +353,18 @@ class _BotaoOpcoesGrade extends StatelessWidget {
                   SwitchListTile(
                     title: const Text(
                       'Linhas',
-                      style: TextStyle(color: PaletaProvisoria.claro),
+                      style: TextStyle(color: Paleta.claro),
                     ),
-                    activeThumbColor: PaletaProvisoria.acento,
+                    activeThumbColor: Paleta.acento,
                     value: controlador.mostrarLinhasGrade,
                     onChanged: controlador.alternarLinhasGrade,
                   ),
                   SwitchListTile(
                     title: const Text(
                       'Pontos',
-                      style: TextStyle(color: PaletaProvisoria.claro),
+                      style: TextStyle(color: Paleta.claro),
                     ),
-                    activeThumbColor: PaletaProvisoria.acento,
+                    activeThumbColor: Paleta.acento,
                     value: controlador.mostrarPontosGrade,
                     onChanged: controlador.alternarPontosGrade,
                   ),
@@ -397,9 +397,9 @@ class _SeletorModo extends StatelessWidget {
           child: ChoiceChip(
             label: const Text('Evolução completa'),
             selected: completa,
-            selectedColor: PaletaProvisoria.acento.withValues(alpha: 0.35),
-            backgroundColor: PaletaProvisoria.cinzaEscuro,
-            labelStyle: const TextStyle(color: PaletaProvisoria.claro),
+            selectedColor: Paleta.acento.withValues(alpha: 0.35),
+            backgroundColor: Paleta.cinzaEscuro,
+            labelStyle: const TextStyle(color: Paleta.claro),
             onSelected: (_) => controlador.definirFaixa(null),
           ),
         ),
@@ -408,12 +408,12 @@ class _SeletorModo extends StatelessWidget {
           child: ChoiceChip(
             label: const Text('Parte isolada'),
             selected: !completa,
-            selectedColor: PaletaProvisoria.acento.withValues(alpha: 0.35),
-            backgroundColor: PaletaProvisoria.cinzaEscuro,
+            selectedColor: Paleta.acento.withValues(alpha: 0.35),
+            backgroundColor: Paleta.cinzaEscuro,
             labelStyle: TextStyle(
               color: temPartes
-                  ? PaletaProvisoria.claro
-                  : PaletaProvisoria.cinzaMedio,
+                  ? Paleta.claro
+                  : Paleta.cinzaMedio,
             ),
             onSelected: temPartes
                 ? (_) => controlador.definirFaixa(
@@ -499,12 +499,12 @@ class _Bolinha extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: destacada
-                ? PaletaProvisoria.acento.withValues(alpha: 0.25)
-                : PaletaProvisoria.cinzaEscuro,
+                ? Paleta.acento.withValues(alpha: 0.25)
+                : Paleta.cinzaEscuro,
             border: Border.all(
               color: destacada
-                  ? PaletaProvisoria.acento
-                  : PaletaProvisoria.cinzaMedio,
+                  ? Paleta.acento
+                  : Paleta.cinzaMedio,
               width: destacada ? 2.5 : 1.5,
             ),
           ),
@@ -512,8 +512,8 @@ class _Bolinha extends StatelessWidget {
             '$numero',
             style: TextStyle(
               color: destacada
-                  ? PaletaProvisoria.acento
-                  : PaletaProvisoria.claro,
+                  ? Paleta.acento
+                  : Paleta.claro,
               fontWeight: destacada ? FontWeight.bold : FontWeight.normal,
             ),
           ),
@@ -532,7 +532,7 @@ class _Seta extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 4),
       child: Icon(
         Icons.arrow_right_alt,
-        color: PaletaProvisoria.cinzaMedio,
+        color: Paleta.cinzaMedio,
       ),
     );
   }
@@ -561,13 +561,13 @@ class _BotaoAdicionarParte extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: PaletaProvisoria.cinzaMedio.withValues(alpha: 0.5),
+              color: Paleta.cinzaMedio.withValues(alpha: 0.5),
               width: 1.5,
             ),
           ),
           child: Icon(
             Icons.add,
-            color: PaletaProvisoria.cinzaMedio.withValues(alpha: 0.5),
+            color: Paleta.cinzaMedio.withValues(alpha: 0.5),
           ),
         ),
       ),

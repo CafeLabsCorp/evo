@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'tema/paleta_provisoria.dart';
+import 'tema/paleta.dart';
 import 'telas/tela_playback.dart';
 
 void main() {
@@ -14,25 +14,23 @@ class EvoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Evo Lab',
-      // Tema escuro PROVISÓRIO — ver `tema/paleta_provisoria.dart`. Some
-      // inteiro quando o `design` entregar a paleta definitiva.
       themeMode: ThemeMode.dark,
       darkTheme: ThemeData(
         useMaterial3: true,
         brightness: Brightness.dark,
         fontFamily: 'Roboto',
-        scaffoldBackgroundColor: PaletaProvisoria.fundo,
+        scaffoldBackgroundColor: Paleta.fundo,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: PaletaProvisoria.cinzaMedio,
+          seedColor: Paleta.cinzaMedio,
           brightness: Brightness.dark,
-          primary: PaletaProvisoria.claro,
-          secondary: PaletaProvisoria.acento,
-          surface: PaletaProvisoria.superficie,
-          error: PaletaProvisoria.erro,
+          primary: Paleta.claro,
+          secondary: Paleta.acento,
+          surface: Paleta.superficie,
+          error: Paleta.erro,
         ),
         appBarTheme: const AppBarTheme(
-          backgroundColor: PaletaProvisoria.superficie,
-          foregroundColor: PaletaProvisoria.claro,
+          backgroundColor: Paleta.superficie,
+          foregroundColor: Paleta.claro,
         ),
       ),
       home: const TelaPlayback(caminhoAsset: 'assets/evolucoes/exemplo.json'),
