@@ -4,6 +4,7 @@ import 'estado.dart';
 import 'eventos.dart';
 import 'movimento.dart';
 import 'parte.dart';
+import 'percussao.dart';
 import 'preenchimento.dart';
 import 'segmento.dart';
 
@@ -194,6 +195,17 @@ ResultadoCompilacaoParte compilarParte(
       'esperado $t.',
     );
     porSlot[slot] = linhaDoTempo;
+
+    _emitirPercussao(
+      diagnosticos: diagnosticos,
+      eventos: eventos,
+      indiceParte: indiceParte,
+      slot: slot,
+      percussao: atribuicao.percussao,
+      cadenciaEntrada: inicial.cad,
+      cadenciaResultante: cadenciaFinalMovimento,
+      t: t,
+    );
   }
 
   final List<EstadoFormacao> tiques = List<EstadoFormacao>.generate(t, (int i) {
@@ -209,6 +221,61 @@ ResultadoCompilacaoParte compilarParte(
     diagnosticos: diagnosticos,
     eventos: eventos,
   );
+}
+
+/// Emite o canal de percussão (mão na perna, pés se deslocando) para um
+/// slot, cobrindo TODA a faixa `0..t-1` do slot na parte — preenchimento de
+/// espera, movimento e preenchimento de fechamento, não só a janela do
+/// movimento. Quem está batendo enquanto espera a deixa e continua depois
+/// é o comportamento real.
+///
+/// Regra de aceitação por CADÊNCIA, não por movimento (é o que evita
+/// explosão com o catálogo): aceita quando a cadência de entrada do slot
+/// na parte E a cadência resultante do movimento forem `firme`,
+/// `marcandoPasso` ou `marchando`; rejeita quando qualquer uma for
+/// `descansar`. `cadenciaEntrada`/`cadenciaResultante` aqui são as MESMAS
+/// duas referências que o resto de `compilarParte` já usa
+/// (`entrada[slot].cad` e `movimento.cadenciaResultante(entrada)`) —
+/// nenhuma terceira fonte.
+///
+/// Densidade fixa: uma batida por TEMPO, nunca por passo — o motor não
+/// tem noção de qual pé é qual (exigiria origem de fase, e um slot que
+/// comece a marchar num tempo de paridade diferente do relógio global
+/// ficaria em contratempo dos demais, sem jeito de auditar visualmente).
+/// Reservado no schema para o futuro (`aCadaTempos`/`faseTempos`, ausentes
+/// ⇒ `1`/`0`), não implementado agora — ver `json/evolucao_json.dart`.
+void _emitirPercussao({
+  required List<Diagnostico> diagnosticos,
+  required List<Evento> eventos,
+  required int indiceParte,
+  required int slot,
+  required Percussao? percussao,
+  required Cadencia cadenciaEntrada,
+  required Cadencia cadenciaResultante,
+  required int t,
+}) {
+  if (percussao == null) return;
+
+  final bool aceita =
+      cadenciaEntrada != Cadencia.descansar &&
+      cadenciaResultante != Cadencia.descansar;
+
+  if (!aceita) {
+    diagnosticos.add(
+      DiagnosticoPercussaoInvalida(
+        indiceParte: indiceParte,
+        slot: slot,
+        cadenciaEntrada: cadenciaEntrada,
+        cadenciaResultante: cadenciaResultante,
+      ),
+    );
+    return;
+  }
+
+  final TipoBatida tipo = percussao.tipoBatida;
+  for (int i = 1; i < t; i += 2) {
+    eventos.add(EventoBatida(slot: slot, tiqueGlobal: i, tipo: tipo));
+  }
 }
 
 List<EstadoPessoa> _continuacaoImplicita(EstadoPessoa inicial, int tiques) {
@@ -229,7 +296,11 @@ void _emitirEventos(
 }) {
   for (final int tiqueRelativo in resultado.batidas) {
     destino.add(
-      EventoBatida(slot: slot, tiqueGlobal: offsetGlobalLocal + tiqueRelativo),
+      EventoBatida(
+        slot: slot,
+        tiqueGlobal: offsetGlobalLocal + tiqueRelativo,
+        tipo: TipoBatida.passo,
+      ),
     );
   }
   for (final JanelaRotacao janela in resultado.janelasRotacao) {

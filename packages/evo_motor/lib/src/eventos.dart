@@ -45,14 +45,39 @@ sealed class Evento {
   const Evento();
 }
 
-/// Uma batida de ritmo (`bateRitmoAoJuntar` ou `bateRitmo` de `Pausa`) foi
-/// marcada por um slot num tique global. Inerte no estado: alternar a flag
-/// que gera este evento nunca muda um tique de posição/direção/cadência.
+/// O que fisicamente bateu num [EventoBatida]. `passo` é a batida de
+/// cadência que já existia (`bateRitmoAoJuntar`/`bateRitmo` de `Pausa`);
+/// `mao`/`pernaEsquerda`/`pernaDireita` são o canal de percussão (ver
+/// `Percussao`, em `percussao.dart`) — mão na perna, pés se deslocando,
+/// caindo junto com a passada.
+///
+/// Sem default no construtor de [EventoBatida]: um default silencioso aqui
+/// seria como se perder a distinção entre "passo" e "percussão" bem no
+/// ponto em que ela passou a existir.
+enum TipoBatida { passo, mao, pernaEsquerda, pernaDireita }
+
+/// Uma batida foi marcada por um slot num tique global — de cadência
+/// (`bateRitmoAoJuntar`/`bateRitmo` de `Pausa`, `tipo: TipoBatida.passo`)
+/// ou de percussão (ver `Percussao`). Inerte no estado: alternar a flag/
+/// atribuição que gera este evento nunca muda um tique de
+/// posição/direção/cadência.
+///
+/// **A lista de eventos NÃO é globalmente ordenada por tique.** Dentro de
+/// um mesmo slot, os eventos de percussão vêm sempre depois dos eventos de
+/// movimento daquele slot (documentado em `compilador.dart`); entre slots
+/// diferentes não há ordem garantida nenhuma. Consumidores que precisam de
+/// ordem (render, por exemplo) devem indexar/ordenar eles mesmos — nunca
+/// depender da ordem de iteração desta lista.
 class EventoBatida extends Evento {
-  const EventoBatida({required this.slot, required this.tiqueGlobal});
+  const EventoBatida({
+    required this.slot,
+    required this.tiqueGlobal,
+    required this.tipo,
+  });
 
   final int slot;
   final int tiqueGlobal;
+  final TipoBatida tipo;
 }
 
 /// Uma rotação visual (ver [JanelaRotacao]) num intervalo de tiques

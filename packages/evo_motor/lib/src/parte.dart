@@ -1,4 +1,5 @@
 import 'movimento.dart';
+import 'percussao.dart';
 import 'preenchimento.dart';
 
 /// O que um slot faz dentro de uma [Parte].
@@ -18,6 +19,7 @@ class Atribuicao {
     required this.movimento,
     this.offsetInicialTiques = 0,
     this.preenchimento,
+    this.percussao,
   }) : assert(offsetInicialTiques >= 0) {
     if (offsetInicialTiques.isOdd) {
       throw ArgumentError.value(
@@ -34,6 +36,15 @@ class Atribuicao {
   final Movimento movimento;
   final int offsetInicialTiques;
   final Preenchimento? preenchimento;
+
+  /// Percussão (mão na perna, pés se deslocando) atribuída a este slot
+  /// nesta parte — `null` significa nenhuma. Ver a regra de emissão em
+  /// `compilador.dart`: cobre TODA a faixa `0..T-1` do slot na parte
+  /// (preenchimento de espera + movimento + preenchimento de fechamento),
+  /// não só a janela do movimento, e é rejeitada (com diagnóstico, sem
+  /// abortar) quando a cadência de entrada ou a resultante do movimento é
+  /// `descansar`.
+  final Percussao? percussao;
 }
 
 /// Um frame de instruções simultâneas: subgrupos diferentes fazendo

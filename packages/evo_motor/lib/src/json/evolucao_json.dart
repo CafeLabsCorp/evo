@@ -16,6 +16,7 @@ import '../estado.dart';
 import '../geometria.dart';
 import '../movimento.dart';
 import '../parte.dart';
+import '../percussao.dart';
 import '../preenchimento.dart';
 import '../simulador.dart';
 
@@ -149,12 +150,35 @@ Preenchimento? preenchimentoDoJson(Map<String, dynamic>? json) {
   return Preenchimento.paraCadencia(cadenciaDoJson(json['cadencia'] as String));
 }
 
+MembroPercussao membroPercussaoDoJson(String valor) => switch (valor) {
+  'mao' => MembroPercussao.mao,
+  'pernaEsquerda' => MembroPercussao.pernaEsquerda,
+  'pernaDireita' => MembroPercussao.pernaDireita,
+  _ => throw FormatException('Membro de percussão desconhecido no JSON: "$valor"'),
+};
+
+/// `percussao` é opcional em `atribuicao`; ausente ⇒ `null` ⇒ nenhum
+/// evento (JSON já gravado sem o campo lê idêntico a antes). `membro`
+/// desconhecido lança — nunca cai num membro default silencioso, no
+/// mesmo estilo de `cadenciaDoJson`.
+///
+/// Reservado no schema (não implementado ainda): `aCadaTempos` e
+/// `faseTempos`, para densidade de percussão diferente de "toda vez".
+/// Ausentes hoje equivaleriam a `1`/`0` (uma batida por tempo, sem
+/// deslocamento de fase) — que é a única densidade que o motor de fato
+/// produz agora (ver a nota de densidade em `compilador.dart`).
+Percussao? percussaoDoJson(Map<String, dynamic>? json) {
+  if (json == null) return null;
+  return Percussao(membro: membroPercussaoDoJson(json['membro'] as String));
+}
+
 Atribuicao atribuicaoDoJson(Map<String, dynamic> json) => Atribuicao(
   movimento: movimentoDoJson(json['movimento'] as Map<String, dynamic>),
   offsetInicialTiques: json['offsetInicialTiques'] as int? ?? 0,
   preenchimento: preenchimentoDoJson(
     json['preenchimento'] as Map<String, dynamic>?,
   ),
+  percussao: percussaoDoJson(json['percussao'] as Map<String, dynamic>?),
 );
 
 Parte parteDoJson(Map<String, dynamic> json) {

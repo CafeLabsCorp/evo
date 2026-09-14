@@ -18,6 +18,7 @@ export 'src/geometria.dart';
 export 'src/json/evolucao_json.dart';
 export 'src/movimento.dart';
 export 'src/parte.dart';
+export 'src/percussao.dart';
 export 'src/preenchimento.dart';
 export 'src/segmento.dart';
 export 'src/simulador.dart';

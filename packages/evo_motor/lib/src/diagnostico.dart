@@ -91,6 +91,34 @@ class DiagnosticoColisao extends Diagnostico {
       'dmin² = $distanciaMinimaQuadradoQuartos quartos².';
 }
 
+/// Percussão inválida: uma `Atribuicao.percussao` foi pedida num slot cuja
+/// cadência de entrada OU cadência resultante do movimento é `descansar`.
+/// Rejeitado por inteiro — zero eventos de percussão para aquele slot
+/// naquela parte, mas o movimento em si roda normal (os tiques de
+/// posição/direção/cadência ficam bit-idênticos aos da mesma parte sem
+/// percussão nenhuma).
+class DiagnosticoPercussaoInvalida extends Diagnostico {
+  const DiagnosticoPercussaoInvalida({
+    required this.indiceParte,
+    required this.slot,
+    required this.cadenciaEntrada,
+    required this.cadenciaResultante,
+    super.severidade = SeveridadeDiagnostico.erro,
+  });
+
+  final int indiceParte;
+  final int slot;
+  final Cadencia cadenciaEntrada;
+  final Cadencia cadenciaResultante;
+
+  @override
+  String toString() =>
+      'Percussão inválida na parte $indiceParte, slot $slot: cadência de '
+      'entrada $cadenciaEntrada, resultante $cadenciaResultante — '
+      'percussão exige firme, marcandoPasso ou marchando nas duas pontas '
+      '($severidade).';
+}
+
 /// Checagem 4 — Fora dos limites: um slot saiu do campo configurado num
 /// tique.
 class DiagnosticoForaDosLimites extends Diagnostico {

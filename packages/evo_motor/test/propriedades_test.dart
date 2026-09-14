@@ -419,33 +419,73 @@ void main() {
     },
   );
 
-  test('Determinismo: reprocessar duas vezes dá resultado bit-idêntico', () {
-    final EstadoFormacao inicial = EstadoFormacao(<int, EstadoPessoa>{
-      0: const EstadoPessoa(x: 0, y: 0, dir: 0, cad: Cadencia.firme),
-      1: const EstadoPessoa(x: 4, y: 0, dir: 0, cad: Cadencia.firme),
-    });
-    final List<Parte> partes = <Parte>[
-      Parte(
-        ordem: 0,
-        atribuicoes: <int, Atribuicao>{
-          0: Atribuicao(
-            movimento: Catalogo.emFrenteMarche(
-              3,
-              aoTerminar: AoTerminarMarche.firme,
+  test(
+    'Determinismo: reprocessar duas vezes dá resultado bit-idêntico '
+    '(inclusive a SEQUÊNCIA de eventos, tipo+slot+tique, em ordem — '
+    'Propriedade 10/teste 10 do canal de percussão)',
+    () {
+      final EstadoFormacao inicial = EstadoFormacao(<int, EstadoPessoa>{
+        0: const EstadoPessoa(x: 0, y: 0, dir: 0, cad: Cadencia.firme),
+        1: const EstadoPessoa(x: 4, y: 0, dir: 0, cad: Cadencia.firme),
+      });
+      final List<Parte> partes = <Parte>[
+        Parte(
+          ordem: 0,
+          atribuicoes: <int, Atribuicao>{
+            0: Atribuicao(
+              movimento: Catalogo.emFrenteMarche(
+                3,
+                aoTerminar: AoTerminarMarche.firme,
+              ),
+              percussao: const Percussao(membro: MembroPercussao.mao),
             ),
-          ),
-          1: Atribuicao(movimento: Catalogo.direitaVolverParado()),
-        },
-      ),
-    ];
+            1: Atribuicao(
+              movimento: Catalogo.direitaVolverParado(
+                bateRitmoAoJuntar: true,
+              ),
+              percussao: const Percussao(
+                membro: MembroPercussao.pernaEsquerda,
+              ),
+            ),
+          },
+        ),
+      ];
 
-    final ResultadoSimulacao r1 = simular(inicial, partes);
-    final ResultadoSimulacao r2 = simular(inicial, partes);
+      final ResultadoSimulacao r1 = simular(inicial, partes);
+      final ResultadoSimulacao r2 = simular(inicial, partes);
 
-    expect(r1.porTique.length, r2.porTique.length);
-    for (int i = 0; i < r1.porTique.length; i++) {
-      expect(r1.porTique[i], r2.porTique[i]);
-    }
-    expect(r1.diagnosticos.length, r2.diagnosticos.length);
-  });
+      expect(r1.porTique.length, r2.porTique.length);
+      for (int i = 0; i < r1.porTique.length; i++) {
+        expect(r1.porTique[i], r2.porTique[i]);
+      }
+      expect(r1.diagnosticos.length, r2.diagnosticos.length);
+
+      expect(r1.eventos.length, r2.eventos.length);
+      expect(r1.eventos, isNotEmpty);
+      for (int i = 0; i < r1.eventos.length; i++) {
+        expect(
+          _assinaturaEvento(r1.eventos[i]),
+          _assinaturaEvento(r2.eventos[i]),
+          reason: 'evento $i divergiu entre as duas execuções',
+        );
+      }
+    },
+  );
 }
+
+/// Projeção comparável de um [Evento] — (tipo runtime, slot, tique, campo
+/// extra) — usada só para comparar SEQUÊNCIAS de eventos entre duas
+/// execuções (nem `EventoBatida` nem `EventoRotacao` implementam `==`).
+Object _assinaturaEvento(Evento e) => switch (e) {
+  EventoBatida(:final int slot, :final int tiqueGlobal, :final TipoBatida tipo) =>
+    ('EventoBatida', slot, tiqueGlobal, tipo),
+  EventoRotacao(:final int slot, :final JanelaRotacao janela) => (
+    'EventoRotacao',
+    slot,
+    janela.tiqueInicio,
+    janela.tiqueFim,
+    janela.direcaoAntes,
+    janela.direcaoDepois,
+    janela.deltaSetor,
+  ),
+};
