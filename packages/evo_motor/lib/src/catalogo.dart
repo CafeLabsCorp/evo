@@ -69,7 +69,8 @@ abstract final class Catalogo {
     bool bateRitmoAoJuntar = false,
   }) => Movimento(
     nome: 'Marcar passo',
-    exigido: null, // qualquer, sem exceção de teleporte documentada
+    exigido: null, // qualquer — a transição de marchando é modelada de verdade
+    transicaoDeMarchandoModelada: true,
     segmentos: (Cadencia entrada) => <Segmento>[
       if (entrada == Cadencia.marchando) ...<Segmento>[
         const Avanco(1),

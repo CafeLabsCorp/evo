@@ -42,6 +42,7 @@ class Movimento {
     required List<Segmento> Function(Cadencia entrada) segmentos,
     required this.cadenciaResultante,
     this.permiteTeleporteDeMarchando = false,
+    this.transicaoDeMarchandoModelada = false,
   }) : _segmentosPara = segmentos;
 
   final String nome;
@@ -49,6 +50,25 @@ class Movimento {
   final List<Segmento> Function(Cadencia entrada) _segmentosPara;
   final Cadencia Function(Cadencia entrada) cadenciaResultante;
   final bool permiteTeleporteDeMarchando;
+
+  /// `true` quando este movimento (com `exigido == null`, "qualquer"
+  /// cadência de entrada) já absorve a saída da marcha com um passo de
+  /// transição REAL — não há teleporte a avisar. Hoje só "Marcar passo"
+  /// (`Catalogo.marcarPasso`), que desde o catálogo v2 modela a transição
+  /// de `marchando` como `A(1)·J·P(N)` (o mesmo passo de transição que
+  /// "Alto!" cobra).
+  ///
+  /// **Não confundir com [permiteTeleporteDeMarchando]**: aquele campo é
+  /// "a exigência de cadência falhou, mas eu deixo passar vindo de
+  /// `marchando` mesmo assim — e AVISO que é uma parada teleportada"
+  /// (usado quando `exigido != null`). Este aqui é "não existe teleporte
+  /// nenhum para avisar" (usado quando `exigido == null`, o movimento já
+  /// aceitava `marchando` sem ressalva — a única pergunta é se a
+  /// transição real foi modelada ou não). São dois eixos ortogonais;
+  /// fundir os dois um dia faria "Marcar passo" voltar a acusar teleporte
+  /// falsamente, ou faria um movimento de exigência estrita perder o
+  /// aviso legítimo.
+  final bool transicaoDeMarchandoModelada;
 
   /// Segmentos concretos deste movimento para uma cadência de ENTRADA
   /// dada. Para a esmagadora maioria dos movimentos do catálogo é uma
@@ -73,8 +93,10 @@ class Movimento {
     final Set<Cadencia>? ex = exigido;
     if (ex == null) {
       // "qualquer" — nunca bloqueia; ainda assim, entrar vindo de
-      // `marchando` é uma parada teleportada e vale aviso informativo.
-      if (atual == Cadencia.marchando) {
+      // `marchando` é uma parada teleportada e vale aviso informativo —
+      // A MENOS que este movimento já modele a transição de verdade (ver
+      // `transicaoDeMarchandoModelada`), caso em que não há nada a avisar.
+      if (atual == Cadencia.marchando && !transicaoDeMarchandoModelada) {
         return const ResultadoPrecondicao(ok: true, avisoTeleporte: true);
       }
       return const ResultadoPrecondicao(ok: true, avisoTeleporte: false);

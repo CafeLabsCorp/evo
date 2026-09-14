@@ -153,11 +153,27 @@ void main() {
       },
     );
 
-    test('aceita qualquer cadência de entrada', () {
-      for (final Cadencia c in Cadencia.values) {
-        expect(Catalogo.marcarPasso().checarPrecondicao(c).ok, isTrue);
-      }
-    });
+    test(
+      'aceita qualquer cadência de entrada, SEM aviso de teleporte '
+      '(catálogo v2: A(1)·J·P(N) já modela a saída real da marcha — não '
+      'há parada teleportada a avisar, ver Movimento.transicaoDeMarchandoModelada)',
+      () {
+        for (final Cadencia c in Cadencia.values) {
+          final ResultadoPrecondicao p = Catalogo.marcarPasso()
+              .checarPrecondicao(c);
+          expect(p.ok, isTrue);
+          expect(
+            p.avisoTeleporte,
+            isFalse,
+            reason:
+                'entrada=$c: "Marcar passo" desde a v2 do catálogo absorve '
+                'a saída de `marchando` com um passo de transição real '
+                '(A(1)·J·P(N)), então nunca teleporta — mesmo vindo de '
+                'marchando.',
+          );
+        }
+      },
+    );
   });
 
   group('#4 Bater o ritmo', () {

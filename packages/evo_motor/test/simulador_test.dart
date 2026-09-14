@@ -88,6 +88,26 @@ void main() {
     );
 
     test(
+      '"Marcar passo" a partir de marchando não gera NENHUM diagnóstico '
+      '(catálogo v2: transição real, não teleporte — controle negativo do '
+      'teste de aviso de "Sentido" logo abaixo, que precisa continuar '
+      'verde)',
+      () {
+        final EstadoFormacao inicial = EstadoFormacao(<int, EstadoPessoa>{
+          0: const EstadoPessoa(x: 0, y: 0, dir: 0, cad: Cadencia.marchando),
+        });
+        final Parte parte = Parte(
+          ordem: 0,
+          atribuicoes: <int, Atribuicao>{
+            0: Atribuicao(movimento: Catalogo.marcarPasso(tempos: 2)),
+          },
+        );
+        final ResultadoSimulacao r = simular(inicial, <Parte>[parte]);
+        expect(r.diagnosticos, isEmpty);
+      },
+    );
+
+    test(
       'Sentido a partir de marchando é permitido, mas emite aviso de teleporte',
       () {
         final EstadoFormacao inicial = EstadoFormacao(<int, EstadoPessoa>{
