@@ -5,11 +5,15 @@ import 'package:evo_motor/evo_motor.dart';
 import 'package:flutter/material.dart';
 
 import '../playback/controlador_playback.dart';
+import '../tema/paleta_provisoria.dart';
 
-const Color _corNavy = Color(0xFF1E3A5F);
-const Color _corAmbar = Color(0xFFFFB300);
-const Color _corGrade = Color(0x331E3A5F);
-const Color _corFundo = Color(0xFFF7F7F5);
+// Paleta de desenho PROVISÓRIA — ver `tema/paleta_provisoria.dart`. Fundo
+// escuro, grade e rosa dos ventos em cinza discreto, pessoas em cinza
+// claro/branco. Âmbar só onde carrega significado (batida/destaque).
+const Color _corGrade = PaletaProvisoria.grade;
+const Color _corGradePonto = PaletaProvisoria.gradePonto;
+const Color _corFundo = PaletaProvisoria.fundo;
+const Color _corDestaque = PaletaProvisoria.acento;
 
 enum _EstiloBorda { solida, tracejada, pontilhada }
 
@@ -26,24 +30,27 @@ class _EstiloCadencia {
 
 /// Cadência codificada em três canais — cor + glifo + estilo de borda —
 /// nunca só cor, pra não depender de daltonismo/contraste de projetor.
+/// Numa paleta de cinzas a distinção por cor (aqui, luminosidade) encolhe
+/// bastante, então o glifo (efetivamente desenhado em [_desenharPessoa],
+/// não só carregado como dado) e o estilo de borda carregam mais peso.
 const Map<Cadencia, _EstiloCadencia> _estilos = <Cadencia, _EstiloCadencia>{
   Cadencia.firme: _EstiloCadencia(
-    cor: _corNavy,
+    cor: Color(0xFFD3D6DA),
     glifo: '■',
     borda: _EstiloBorda.solida,
   ),
   Cadencia.descansar: _EstiloCadencia(
-    cor: Color(0xFF9AA5B1),
+    cor: Color(0xFF6A6E74),
     glifo: '○',
     borda: _EstiloBorda.tracejada,
   ),
   Cadencia.marcandoPasso: _EstiloCadencia(
-    cor: _corAmbar,
+    cor: Color(0xFF9BA0A6),
     glifo: '×',
     borda: _EstiloBorda.pontilhada,
   ),
   Cadencia.marchando: _EstiloCadencia(
-    cor: _corNavy,
+    cor: Color(0xFFF2F3F5),
     glifo: '▲',
     borda: _EstiloBorda.solida,
   ),
@@ -82,7 +89,7 @@ class FormacaoPainter extends CustomPainter {
     final Paint linha = Paint()
       ..color = _corGrade
       ..strokeWidth = 1;
-    final Paint ponto = Paint()..color = _corGrade.withValues(alpha: 0.6);
+    final Paint ponto = Paint()..color = _corGradePonto;
 
     final int meiaLargura = campo.larguraCelulas ~/ 2;
     final int meiaAltura = campo.alturaCelulas ~/ 2;
@@ -115,7 +122,7 @@ class FormacaoPainter extends CustomPainter {
     const double raio = 22;
     final Offset centro = Offset(size.width - 40, 40);
     final Paint corpo = Paint()
-      ..color = _corNavy.withValues(alpha: 0.85)
+      ..color = PaletaProvisoria.cinzaMedio.withValues(alpha: 0.85)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5;
     canvas.drawCircle(centro, raio, corpo);
@@ -123,18 +130,21 @@ class FormacaoPainter extends CustomPainter {
         ui.ParagraphBuilder(
             ui.ParagraphStyle(textAlign: TextAlign.center, fontSize: 12),
           )
-          ..pushStyle(ui.TextStyle(color: _corNavy))
+          ..pushStyle(ui.TextStyle(color: PaletaProvisoria.cinzaMedio))
           ..addText('N');
     final ui.Paragraph paragrafo = pb.build()
       ..layout(const ui.ParagraphConstraints(width: 20));
     canvas.drawParagraph(paragrafo, centro + const Offset(-6, -raio - 16));
     // Seta pra Norte (0 graus = topo, mesma convenção do facing setor 0).
+    // Cinza discreto, não âmbar — a rosa dos ventos é referência
+    // permanente, não um sinal de "algo aconteceu", então não gasta o
+    // canal de cor reservado a seleção/parte atual/aviso.
     final Path seta = Path()
       ..moveTo(centro.dx, centro.dy - raio + 4)
       ..lineTo(centro.dx - 5, centro.dy - raio + 14)
       ..lineTo(centro.dx + 5, centro.dy - raio + 14)
       ..close();
-    canvas.drawPath(seta, Paint()..color = _corAmbar);
+    canvas.drawPath(seta, Paint()..color = PaletaProvisoria.cinzaMedio);
   }
 
   void _desenharPessoa(Canvas canvas, Size size, EstadoRenderizado e) {
@@ -159,19 +169,51 @@ class FormacaoPainter extends CustomPainter {
     final Paint borda = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = e.destacado ? 3 : 1.5
-      ..color = e.destacado ? _corAmbar : Colors.black.withValues(alpha: 0.6);
+      ..color = e.destacado ? _corDestaque : Colors.black.withValues(alpha: 0.6);
     _desenharBorda(canvas, quadrado, estilo.borda, borda);
 
     // Triângulo de facing, apontando "pra cima" no referencial já
-    // rotacionado (que corresponde ao facing atual).
+    // rotacionado (que corresponde ao facing atual). Preto translúcido,
+    // não âmbar — é decoração de toda pessoa sempre presente, não um
+    // sinal de "algo aconteceu" (esse canal é reservado a
+    // seleção/parte atual/aviso/batida).
     final Path triangulo = Path()
       ..moveTo(0, -lado * 0.95)
       ..lineTo(-lado * 0.4, -lado * 0.25)
       ..lineTo(lado * 0.4, -lado * 0.25)
       ..close();
-    canvas.drawPath(triangulo, Paint()..color = _corAmbar);
+    canvas.drawPath(triangulo, Paint()..color = Colors.black.withValues(alpha: 0.55));
 
     canvas.restore();
+
+    // Glifo da cadência — desenhado FORA do referencial rotacionado
+    // (depois do `restore()`) de propósito: é um rótulo de estado, tem
+    // que continuar legível não importa o facing (um "▲" ou "■" girado
+    // 45° vira outra forma e some como sinal). O triângulo de facing
+    // acima é a única coisa que deve girar.
+    _desenharGlifo(canvas, centro, estilo);
+  }
+
+  void _desenharGlifo(Canvas canvas, Offset centro, _EstiloCadencia estilo) {
+    final Color corTexto = estilo.cor.computeLuminance() > 0.5
+        ? Colors.black.withValues(alpha: 0.75)
+        : Colors.white.withValues(alpha: 0.9);
+    const double tamanhoFonte = 11;
+    final ui.ParagraphBuilder pb =
+        ui.ParagraphBuilder(
+            ui.ParagraphStyle(
+              textAlign: TextAlign.center,
+              fontSize: tamanhoFonte,
+            ),
+          )
+          ..pushStyle(ui.TextStyle(color: corTexto))
+          ..addText(estilo.glifo);
+    final ui.Paragraph paragrafo = pb.build()
+      ..layout(const ui.ParagraphConstraints(width: 18));
+    canvas.drawParagraph(
+      paragrafo,
+      centro + const Offset(-9, -tamanhoFonte * 0.72),
+    );
   }
 
   void _desenharBorda(Canvas canvas, Rect r, _EstiloBorda estilo, Paint paint) {
@@ -288,7 +330,7 @@ class FormacaoPainter extends CustomPainter {
     }
 
     final Paint tracejado = Paint()
-      ..color = _corNavy.withValues(alpha: 0.35)
+      ..color = PaletaProvisoria.cinzaMedio.withValues(alpha: 0.5)
       ..strokeWidth = 1;
     _desenharLinhaTracejada(canvas, p1, p2, tracejado, 3, 3);
   }

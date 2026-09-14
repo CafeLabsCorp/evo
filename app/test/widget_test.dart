@@ -115,21 +115,65 @@ void main() {
         expect(find.byIcon(Icons.play_circle_filled), findsOneWidget);
       });
 
-      testWidgets('seletor de faixa troca pra uma parte isolada', (
-        WidgetTester tester,
-      ) async {
-        await montar(tester);
+      testWidgets(
+        'toque numa bolinha em modo evolução completa começa o playback '
+        'a partir daquela parte, não do início',
+        (WidgetTester tester) async {
+          await montar(tester);
 
-        await tester.tap(find.text('Evolução completa'));
-        await tester.pump();
-        await tester.pump();
+          // Modo default é evolução completa — controle inequívoco visível.
+          expect(find.text('Evolução completa'), findsOneWidget);
+          expect(find.text('Parte isolada'), findsOneWidget);
 
-        expect(find.textContaining('Parte 1').first, findsWidgets);
-        await tester.tap(find.textContaining('Parte 1').first);
-        await tester.pump();
+          final Slider antes = tester.widget<Slider>(find.byType(Slider));
+          expect(antes.value, 0);
 
-        expect(find.text('Evolução completa'), findsNothing);
-      });
+          // Bolinha "2" (segunda parte) — a fileira tem uma bolinha
+          // numerada por parte, ligada por setas.
+          await tester.tap(find.text('2'));
+          await tester.pump();
+
+          // O toque já inicia o playback sozinho — não fica só selecionado.
+          expect(find.byIcon(Icons.pause_circle_filled), findsOneWidget);
+
+          final Slider depois = tester.widget<Slider>(find.byType(Slider));
+          // Começou a partir da parte 2 (tique > 0), não do início.
+          expect(depois.value, greaterThan(0));
+          // O intervalo do slider continua sendo a evolução inteira — só
+          // o ponto de partida do playhead mudou, o modo não virou
+          // "parte isolada".
+          expect(depois.min, 0);
+          expect(find.text('Evolução completa'), findsOneWidget);
+
+          // Pausa pra não deixar o Ticker rodando quando o teste acabar.
+          await tester.tap(find.byIcon(Icons.pause_circle_filled));
+          await tester.pump();
+        },
+      );
+
+      testWidgets(
+        'modo "parte isolada": toque numa bolinha restringe o playback a '
+        'ela, sem tocar o resto da evolução',
+        (WidgetTester tester) async {
+          await montar(tester);
+
+          await tester.tap(find.text('Parte isolada'));
+          await tester.pump();
+
+          await tester.tap(find.text('3'));
+          await tester.pump();
+
+          expect(find.byIcon(Icons.pause_circle_filled), findsOneWidget);
+
+          final Slider slider = tester.widget<Slider>(find.byType(Slider));
+          // Intervalo restrito à parte 3 — não é mais 0..fim da evolução.
+          expect(slider.min, greaterThan(0));
+          expect(slider.value, slider.min);
+
+          await tester.tap(find.byIcon(Icons.pause_circle_filled));
+          await tester.pump();
+        },
+      );
 
       testWidgets('scrub move o tique sem precisar tocar play', (
         WidgetTester tester,
