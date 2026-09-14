@@ -57,7 +57,7 @@ class _TelaPlaybackState extends State<TelaPlayback>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Evo — playback de evolução')),
+      appBar: AppBar(title: const Text('Evo Lab — playback')),
       body: FutureBuilder<PacoteEvolucao>(
         future: _futuro,
         builder:

@@ -15,7 +15,7 @@ class EvoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Evo',
+      title: 'Evo Lab',
       theme: ThemeData(
         useMaterial3: true,
         fontFamily: 'Roboto',

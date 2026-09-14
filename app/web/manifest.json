@@ -1,11 +1,11 @@
 {
-    "name": "evo_app",
-    "short_name": "evo_app",
+    "name": "Evo Lab",
+    "short_name": "Evo Lab",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Evo Lab — editor de evoluções de ordem unida.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
