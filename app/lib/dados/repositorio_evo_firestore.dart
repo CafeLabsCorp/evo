@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'ordenacao_partes.dart';
 import 'repositorio_evo.dart';
+import 'validacao_espelho.dart';
 
 /// Implementação de [RepositorioEvo] sobre Firestore, escopada a UM clube.
 ///
@@ -38,6 +39,32 @@ import 'repositorio_evo.dart';
 /// simplesmente não mexe nela, o que satisfaz `inalterado` trivialmente).
 /// `EvolucaoDoc`/`PelotaoDoc` nunca precisam carregar um `Timestamp` cru
 /// para isso funcionar.
+///
+/// -----------------------------------------------------------------------
+/// A TRANSAÇÃO LÊ ANTES DE ESCREVER — e isso tem duas consequências
+/// -----------------------------------------------------------------------
+/// 1. A REGRA DE LEITURA PRECISA ACEITAR DOCUMENTO INEXISTENTE. No create,
+///    `tx.get(ref)` cai num documento que ainda não existe, onde `resource`
+///    é null do lado da regra. Enquanto `firestore.rules` tinha
+///    `allow read: if membroAtivo(resource.data.clubId)`, esse `get` dava
+///    erro de avaliação e era NEGADO — a transação abortava antes de a
+///    regra de create sequer rodar, e criar pelotão/evolução era impossível
+///    com qualquer conteúdo. Hoje existe `podeObterDocumentoDeClube()` lá
+///    justamente para este caso. Se alguém "simplificar" aquela regra de
+///    volta, este caminho quebra inteiro de novo.
+///
+/// 2. UM ERRO DENTRO DO CALLBACK CHEGA AQUI DESFIGURADO, em Flutter Web.
+///    `firebase_core_web` transforma a exceção Dart lançada dentro do
+///    callback num `Error` de JS com a mensagem `'Dart exception: ...'` e o
+///    objeto original enfiado numa propriedade. Na volta,
+///    `_flutterfire_internals` não reconhece isso como erro do Firebase
+///    (não contém `FirebaseError`), então NÃO reconverte — e o app recebe um
+///    objeto de JS cru no lugar do `FirebaseException`. Resultado: um
+///    `permission-denied` legítimo caía no `default` de
+///    `falhaPersistenciaDe` e era exibido como "o dado não passou na
+///    validação do servidor", que é uma mentira sobre a causa.
+///    [_transacao] existe para consertar isso: guarda a exceção original
+///    antes de ela cruzar a fronteira para o JS e a relança intacta.
 class RepositorioEvoFirestore implements RepositorioEvo {
   RepositorioEvoFirestore({required FirebaseFirestore firestore, required this.clubId})
     : _db = firestore;
@@ -120,6 +147,7 @@ class RepositorioEvoFirestore implements RepositorioEvo {
 
   @override
   Future<void> gravarParte(ParteDoc parte) => _executar(() async {
+    _exigirValido(validarParte(parte, clubId: clubId));
     await _partes.doc(parte.id).set(<String, dynamic>{
       'clubId': clubId,
       ...parte.paraFirestoreSemTimestamp(),
@@ -135,8 +163,9 @@ class RepositorioEvoFirestore implements RepositorioEvo {
 
   @override
   Future<void> gravarEvolucao(EvolucaoDoc doc) => _executar(() async {
+    _exigirValido(validarEvolucao(doc, clubId: clubId));
     final DocumentReference<Map<String, dynamic>> ref = _evolucoes.doc(doc.id);
-    await _db.runTransaction((Transaction tx) async {
+    await _transacao((Transaction tx) async {
       final DocumentSnapshot<Map<String, dynamic>> atual = await tx.get(ref);
       final Map<String, dynamic> campos = <String, dynamic>{
         'clubId': clubId,
@@ -179,8 +208,9 @@ class RepositorioEvoFirestore implements RepositorioEvo {
 
   @override
   Future<void> gravarPelotao(PelotaoDoc doc) => _executar(() async {
+    _exigirValido(validarPelotao(doc, clubId: clubId));
     final DocumentReference<Map<String, dynamic>> ref = _pelotoes.doc(doc.id);
-    await _db.runTransaction((Transaction tx) async {
+    await _transacao((Transaction tx) async {
       final DocumentSnapshot<Map<String, dynamic>> atual = await tx.get(ref);
       final Map<String, dynamic> campos = <String, dynamic>{
         'clubId': clubId,
@@ -239,6 +269,58 @@ class RepositorioEvoFirestore implements RepositorioEvo {
   });
 
   // ---- helpers internos -----------------------------------------------------
+
+  /// Barra a escrita ANTES da rede quando o validador-espelho
+  /// (`validacao_espelho.dart`) reprova, carregando no erro a verificação
+  /// exata que falhou.
+  ///
+  /// Não é só conforto: é o que dá sentido à mensagem de [SemPermissao]. Como
+  /// o Firestore devolve `permission-denied` igual para "não autorizado" e
+  /// para "não passou na regra", eliminar o segundo caso aqui é a única forma
+  /// de o app afirmar "é autorização" sem estar chutando.
+  void _exigirValido(String? motivo) {
+    if (motivo != null) {
+      throw ErroPersistencia(DocumentoInvalido(motivo));
+    }
+  }
+
+  /// `runTransaction` que preserva a exceção ORIGINAL levantada dentro do
+  /// callback.
+  ///
+  /// Sem isto, em Flutter Web, o `FirebaseException(permission-denied)` que
+  /// `tx.get`/`tx.set` levantam é embrulhado num `Error` de JS na travessia
+  /// Dart -> JS e volta irreconhecível (ver o bloco longo no topo da classe) —
+  /// o app perde o código do erro e passa a exibir a causa errada. Guardar a
+  /// exceção numa variável local antes da travessia e relançá-la aqui é o que
+  /// mantém `falhaPersistenciaDe` recebendo o erro de verdade.
+  Future<void> _transacao(Future<void> Function(Transaction tx) corpo) async {
+    Object? erroInterno;
+    StackTrace? pilhaInterna;
+    try {
+      await _db.runTransaction((Transaction tx) async {
+        // Zerado a cada tentativa: `runTransaction` re-executa o callback em
+        // caso de contenção, e um erro de uma tentativa anterior que acabou
+        // dando certo não pode sobreviver até o fim.
+        erroInterno = null;
+        pilhaInterna = null;
+        try {
+          await corpo(tx);
+        } catch (erro, pilha) {
+          erroInterno = erro;
+          pilhaInterna = pilha;
+          rethrow;
+        }
+      });
+    } catch (_) {
+      final Object? erro = erroInterno;
+      final StackTrace? pilha = pilhaInterna;
+      // `erro == null` significa que a falha foi no COMMIT, não no callback —
+      // esse caminho não cruza a fronteira do JS desfigurado, então o erro que
+      // já veio é o bom.
+      if (erro == null) rethrow;
+      Error.throwWithStackTrace(erro, pilha ?? StackTrace.current);
+    }
+  }
 
   Future<void> _apagarEmLotes(
     List<DocumentReference<Map<String, dynamic>>> refs,

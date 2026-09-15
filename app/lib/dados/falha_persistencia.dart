@@ -17,8 +17,20 @@ final class SemTrava extends FalhaPersistencia {
   const SemTrava();
 }
 
-/// `permission-denied` — a Security Rule recusou. Em single-user isso quase
-/// sempre significa sessão expirada/clube errado, não "servidor com bug".
+/// `permission-denied` — a Security Rule recusou.
+///
+/// ATENÇÃO AO LER ISTO COMO "É AUTORIZAÇÃO": o Firestore devolve
+/// `permission-denied` IDÊNTICO para "você não tem autorização" e para "seu
+/// documento não passou na validação da regra". Os dois são indistinguíveis
+/// pelo erro.
+///
+/// O que torna a leitura "é autorização" defensável é o validador-espelho
+/// (`validacao_espelho.dart`): toda escrita passa por ele ANTES da rede, e um
+/// documento malformado vira [DocumentoInvalido] sem nunca sair do cliente.
+/// Quando um `permission-denied` chega mesmo assim, o ramo de validação já foi
+/// eliminado — sobra sessão expirada, clube errado, ou uid fora de
+/// `membrosAtivos`. Se o espelho for deixado divergir da regra, esta dedução
+/// deixa de valer e a mensagem volta a mentir.
 final class SemPermissao extends FalhaPersistencia {
   const SemPermissao();
 }
@@ -33,12 +45,27 @@ final class ForaDoAr extends FalhaPersistencia {
   const ForaDoAr();
 }
 
-/// O documento não passou na validação do servidor (`invalid-argument`,
-/// `failed-precondition`, ou qualquer erro de formatação detectado antes de
-/// chegar lá). Diferente de [ForaDoAr]: repetir a mesma escrita sem mudar
-/// nada não resolve.
+/// O documento não passou na validação. Diferente de [ForaDoAr]: repetir a
+/// mesma escrita sem mudar nada não resolve.
+///
+/// [detalhe] carrega QUAL verificação falhou, em texto pronto para a tela
+/// ("o rótulo do slot 12 tem 27 caracteres; o máximo é 24"). Vem preenchido
+/// quando o validador-espelho (`validacao_espelho.dart`) barrou a escrita
+/// antes da rede — que é o caso normal para dado malformado.
+///
+/// Fica `null` quando a falha veio do servidor (`invalid-argument`,
+/// `failed-precondition`) sem passar pelo espelho: aí o app REALMENTE não sabe
+/// o que houve, e a mensagem genérica é honesta em vez de ser um chute. Um
+/// `detalhe` null recorrente é sinal de que o espelho está incompleto frente à
+/// regra — não de que a tela precisa de um texto melhor.
 final class DocumentoInvalido extends FalhaPersistencia {
-  const DocumentoInvalido();
+  const DocumentoInvalido([this.detalhe]);
+
+  final String? detalhe;
+
+  @override
+  String toString() =>
+      detalhe == null ? 'DocumentoInvalido()' : 'DocumentoInvalido($detalhe)';
 }
 
 /// O documento passou de ~1 MiB (limite de tamanho de documento do

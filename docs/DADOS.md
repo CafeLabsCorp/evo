@@ -231,6 +231,7 @@ mesmo commit):
 | `camposPermitidosEvolucao()` | match de `evolucoes/{id}` | Idem para 2.4 |
 | `camposPermitidosParte()` | match de `partes/{id}` | Idem para 2.4 |
 | `rotulosValidos()` | match de `pelotoes/{id}` | `rotulos` é mapa, com `keys().hasOnly([...36 slots...])`, e cada valor validado com `is string && size() <= 24` — **36 verificações desenroladas**, porque Security Rules não têm laço |
+| `podeObterDocumentoDeClube()` | `firestore.rules`, usada no `allow get` de `pelotoes`, `evolucoes` e `partes` | Autoriza a leitura POR ID: documento existente exige `membroAtivo(clubId)`; documento **inexistente** exige só autenticação, porque não há conteúdo a vazar e o app precisa poder perguntar "este id já existe?" antes de criar. O `allow list` continua exigindo `membroAtivo` por documento, então a coleção não é enumerável por aqui |
 | Ausência de bucket de Storage | Console do Firebase | Item 2 (foto/arquivo) é impossível, não só proibido |
 | Ausência de `usuarios/{uid}` | Schema | Não existe documento de perfil onde dado de instrutor possa se acumular |
 | `noindex` + `robots.txt` | `app/web/` | O preview não é indexável por buscador |
@@ -238,6 +239,27 @@ mesmo commit):
 Por que allowlist e não blocklist: uma blocklist protege contra os 14 nomes que
 alguém lembrou de escrever; a allowlist protege contra o campo que ninguém
 imaginou. O custo é o mesmo, o alcance não.
+
+**O espelho no cliente é parte do contrato, não um extra de UX.** O Firestore
+devolve `permission-denied` idêntico para "não autorizado" e para "não passou na
+validação da regra": pelo erro, os dois são indistinguíveis. Para o app
+conseguir dizer qual dos dois foi — e não chutar —, ele repete as verificações
+antes de escrever, em `app/lib/dados/validacao_espelho.dart`, função pura e sem
+rede, com as asserções espelhadas 1:1 e na mesma ordem:
+
+| Função da regra | Espelho no cliente |
+|---|---|
+| `pelotaoValido()` / `rotulosValidos()` | `validarPelotao` |
+| `evolucaoValida()` / `estadoInicialValido()` / `campoValido()` | `validarEvolucao` |
+| `parteValida()` / `atribuicoesValidas()` | `validarParte` |
+
+`membroAtivo()` fica **de fora do espelho de propósito**: é o único ramo que o
+cliente não consegue avaliar sem ir à rede, e é isso que torna a mensagem do app
+defensável — se o espelho passou e o servidor negou, o que sobrou foi
+autorização. Mesma regra de manutenção dos nomes acima: divergência entre a
+regra e o espelho é bug nos dois e se resolve no mesmo commit. Um espelho que
+diverge é pior que espelho nenhum — ele passa a afirmar com autoridade que o
+dado está bom enquanto o servidor recusa.
 
 ### 3.3 Duas lacunas de enforcement, declaradas e não disfarçadas
 

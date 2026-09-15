@@ -76,6 +76,12 @@ String mensagemFalha(Object? erro) {
             'Pacífico/EUA) — não é um erro do app.',
       SemPermissao() => 'Sua conta não tem permissão para isto agora. '
           'Tente sair e entrar de novo.',
+      // O ramo com `detalhe` vem ANTES do genérico: quando o validador-espelho
+      // barrou a escrita antes da rede, ele sabe exatamente qual verificação
+      // falhou e em qual slot. O genérico abaixo só sobra quando a negação veio
+      // do servidor sem passar pelo espelho — aí o app realmente não sabe, e
+      // dizer "confira os campos" é o mais honesto que dá.
+      DocumentoInvalido(detalhe: final String motivo) => motivo,
       DocumentoInvalido() =>
         'Este dado não passou na validação do servidor. Confira os campos '
             'e tente de novo.',
