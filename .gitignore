@@ -23,3 +23,19 @@ ui-debug.log
 
 # SO
 .DS_Store
+
+# Firebase — credenciais e artefatos que NUNCA podem ir pro repositório
+# público (ver Etapa 0 do handoff do `mobile`). NOTA: isto é disjunto de
+# `app/lib/firebase_options.dart` e `.firebaserc`, que SÃO versionados de
+# propósito — a config web do Firebase não é segredo (ver o comentário no
+# topo de `firebase_options.dart`). O que entra aqui é credencial de
+# verdade: conta de serviço, token de bypass de atestação, e o backup local
+# mais provável de acabar largado na pasta do projeto.
+.env
+.env.*
+**/google-services.json
+**/GoogleService-Info.plist
+**/*serviceAccount*.json
+**/*-firebase-adminsdk-*.json
+**/app_check_debug_token*
+evo-lab-backup-*.json

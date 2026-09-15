@@ -41,6 +41,22 @@ dependencies:
   evo_motor:
     path: ../packages/evo_motor
 
+  # Firebase — só Web (ver docs/DADOS.md e Etapa 0 do handoff). Nenhum bucket
+  # de Storage: não adicionar firebase_storage.
+  firebase_core: ^4.1.1
+  firebase_auth: ^6.1.0
+  cloud_firestore: ^6.0.2
+
+  # Combina os streams de evolução + partes num único PacoteEvolucao
+  # reativo (ver dados/tela_playback_nuvem.dart) — evita reimplementar
+  # CombineLatest à mão.
+  rxdart: ^0.28.0
+
+  # Download de arquivo (export JSON) em Flutter Web via Blob + âncora.
+  # `package:web` no lugar de `dart:html` (deprecado para código Flutter,
+  # dispara `avoid_web_libraries_in_flutter`).
+  web: ^1.1.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -51,6 +67,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  fake_cloud_firestore: ^4.2.0
+  firebase_auth_mocks: ^0.15.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
