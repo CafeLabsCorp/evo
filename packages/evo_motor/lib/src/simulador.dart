@@ -124,10 +124,12 @@ ResultadoSimulacao simular(
 }
 
 Evento _deslocarEvento(Evento evento, int offsetGlobal) => switch (evento) {
-  EventoBatida(:final int slot, :final int tiqueGlobal) => EventoBatida(
-    slot: slot,
-    tiqueGlobal: tiqueGlobal + offsetGlobal,
-  ),
+  EventoBatida(:final int slot, :final int tiqueGlobal, :final TipoBatida tipo) =>
+    EventoBatida(
+      slot: slot,
+      tiqueGlobal: tiqueGlobal + offsetGlobal,
+      tipo: tipo,
+    ),
   EventoRotacao(:final int slot, :final JanelaRotacao janela) => EventoRotacao(
     slot: slot,
     janela: janela.deslocarPara(offsetGlobal),

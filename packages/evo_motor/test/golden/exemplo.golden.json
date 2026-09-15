@@ -594,6 +594,9 @@
               "tipo": "marcarPasso",
               "tempos": 2,
               "bateRitmoAoJuntar": true
+            },
+            "percussao": {
+              "membro": "mao"
             }
           },
           "6": {
@@ -601,6 +604,9 @@
               "tipo": "marcarPasso",
               "tempos": 2,
               "bateRitmoAoJuntar": true
+            },
+            "percussao": {
+              "membro": "mao"
             }
           },
           "7": {
@@ -608,6 +614,9 @@
               "tipo": "marcarPasso",
               "tempos": 2,
               "bateRitmoAoJuntar": true
+            },
+            "percussao": {
+              "membro": "mao"
             }
           },
           "8": {
@@ -615,6 +624,9 @@
               "tipo": "marcarPasso",
               "tempos": 2,
               "bateRitmoAoJuntar": true
+            },
+            "percussao": {
+              "membro": "mao"
             }
           },
           "9": {
@@ -622,36 +634,54 @@
               "tipo": "marcarPasso",
               "tempos": 2,
               "bateRitmoAoJuntar": true
+            },
+            "percussao": {
+              "membro": "mao"
             }
           },
           "10": {
             "movimento": {
               "tipo": "meiaVoltaMarcha",
               "bateRitmoAoJuntar": true
+            },
+            "percussao": {
+              "membro": "pernaEsquerda"
             }
           },
           "11": {
             "movimento": {
               "tipo": "meiaVoltaMarcha",
               "bateRitmoAoJuntar": true
+            },
+            "percussao": {
+              "membro": "pernaEsquerda"
             }
           },
           "12": {
             "movimento": {
               "tipo": "meiaVoltaMarcha",
               "bateRitmoAoJuntar": true
+            },
+            "percussao": {
+              "membro": "pernaEsquerda"
             }
           },
           "13": {
             "movimento": {
               "tipo": "meiaVoltaMarcha",
               "bateRitmoAoJuntar": true
+            },
+            "percussao": {
+              "membro": "pernaEsquerda"
             }
           },
           "14": {
             "movimento": {
               "tipo": "meiaVoltaMarcha",
               "bateRitmoAoJuntar": true
+            },
+            "percussao": {
+              "membro": "pernaEsquerda"
             }
           },
           "15": {
@@ -914,7 +944,7 @@
       },
       {
         "ordem": 4,
-        "nome": "Marcha diagonal — Alfa segue na diagonal (3 tempos); Bravo/Charlie/Delta/Echo continuam o que estavam fazendo (sem atribuição nesta parte)",
+        "nome": "Marcha diagonal — Alfa segue na diagonal (3 tempos) batendo perna direita; Bravo/Charlie/Delta/Echo continuam o que estavam fazendo (sem atribuição nesta parte)",
         "atribuicoes": {
           "0": {
             "movimento": {
@@ -922,6 +952,9 @@
               "n": 3,
               "aoTerminar": "marchando",
               "bateRitmoAoJuntar": false
+            },
+            "percussao": {
+              "membro": "pernaDireita"
             }
           },
           "1": {
@@ -930,6 +963,9 @@
               "n": 3,
               "aoTerminar": "marchando",
               "bateRitmoAoJuntar": false
+            },
+            "percussao": {
+              "membro": "pernaDireita"
             }
           },
           "2": {
@@ -938,6 +974,9 @@
               "n": 3,
               "aoTerminar": "marchando",
               "bateRitmoAoJuntar": false
+            },
+            "percussao": {
+              "membro": "pernaDireita"
             }
           },
           "3": {
@@ -946,6 +985,9 @@
               "n": 3,
               "aoTerminar": "marchando",
               "bateRitmoAoJuntar": false
+            },
+            "percussao": {
+              "membro": "pernaDireita"
             }
           },
           "4": {
@@ -954,6 +996,9 @@
               "n": 3,
               "aoTerminar": "marchando",
               "bateRitmoAoJuntar": false
+            },
+            "percussao": {
+              "membro": "pernaDireita"
             }
           }
         }
