@@ -1,0 +1,485 @@
+rules_version = '2';
+
+// Evo Lab — Firestore Security Rules
+// =============================================================================
+// POSTURA: DEFAULT DENY. Só os paths casados abaixo são alcançáveis; todo
+// outro path, e toda operação não explicitamente liberada, é negada (ver o
+// catch-all no fim do arquivo).
+//
+// Este arquivo é o ENFORCEMENT da política descrita em docs/DADOS.md. Os nomes
+// de função marcados como "contrato" abaixo são citados nominalmente na seção
+// 3.2 daquele documento: divergência entre os dois é bug em um dos dois e
+// precisa ser resolvida no mesmo commit, nunca ignorada.
+//
+//   camposPermitidosClube()    camposPermitidosPelotao()
+//   camposPermitidosEvolucao() camposPermitidosParte()
+//   rotulosValidos()
+//
+// MODELO DE DADOS (tudo top-level, nenhuma subcoleção, nenhum `usuarios/{uid}`):
+//
+//   clubes/{clubId}       documento de AUTORIZAÇÃO — é ele que os filhos
+//                         consultam via get(). Por isso é o último a ser
+//                         apagado no runbook (docs/DADOS.md, seção 4):
+//                         apagá-lo antes dos filhos torna os filhos
+//                         permanentemente inalcançáveis.
+//     nome           string ≤ 60
+//     dono           string (uid) — única fronteira de autorização do clube
+//     membros        map { <uid>: { estado, papel } }
+//     membrosAtivos  map { <uid>: true } — índice lido pelas regras dos filhos
+//     criadoEm       timestamp
+//
+//   pelotoes/{id}    clubId, nome ≤ 60, linhas 1..6, colunas 1..6,
+//                    rotulos { "<slot>": string ≤ 24 }, criadoEm, atualizadoEm
+//   evolucoes/{id}   clubId, pelotaoId, nome ≤ 80, estadoInicial { slots },
+//                    campo? { larguraCelulas, alturaCelulas }, versaoCatalogo,
+//                    criadoEm, atualizadoEm
+//   partes/{id}      clubId, evolucaoId, ordem (number), nome? ≤ 60,
+//                    atribuicoes { "<slot>": ... }, atualizadoEm
+//
+// ALLOWLIST, NÃO BLOCKLIST. Toda escrita passa por `keys().hasOnly([...])`.
+// Uma blocklist protegeria contra os 14 campos proibidos que alguém lembrou de
+// escrever em docs/DADOS.md seção 3.1; a allowlist protege também contra o
+// campo que ninguém imaginou. `idade`, `telefone`, `nascimento`, `photoURL`,
+// `nomeExibicao` e qualquer outro caem sozinhos, sem serem nomeados.
+//
+// -----------------------------------------------------------------------------
+// LIMITAÇÃO CONHECIDA — o interior de `atribuicoes` NÃO é validado
+// -----------------------------------------------------------------------------
+// Security Rules não têm laço. Validar um mapa de tamanho variável exige
+// desenrolar cada chave, como é feito com os 36 slots de `rotulos`. Dá para
+// desenrolar as CHAVES de `atribuicoes` (e é o que se faz: `hasOnly` contra os
+// 36 slots), mas NÃO o comando aninhado dentro de cada valor — o servidor
+// aceita hoje qualquer estrutura ali dentro. O mesmo vale para os valores de
+// `estadoInicial.slots`.
+//
+// EM SINGLE-USER ISSO É ACEITÁVEL: o único escritor é o dono do app, e um dado
+// malformado só prejudica ele mesmo.
+//
+// QUANDO CLUBES MULTIUSUÁRIO ENTRAREM, ISSO VIRA FRONTEIRA DE CONFIANÇA REAL:
+// qualquer membro ativo poderá gravar qualquer coisa em qualquer parte do
+// clube, inclusive texto livre com dado pessoal, dentro de um documento que a
+// Política de Privacidade diz não conter dado pessoal. O que hoje é "validação
+// ausente" passa a ser "campo livre não auditado". Precisa ser resolvido ANTES
+// do gatilho 1 de docs/DADOS.md (seção 8), não depois.
+// -----------------------------------------------------------------------------
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---- básicos ----------------------------------------------------------
+
+    function autenticado() {
+      return request.auth != null;
+    }
+    function uid() {
+      return request.auth.uid;
+    }
+    // Documento DEPOIS da escrita (em update já vem com o merge aplicado).
+    function next() {
+      return request.resource.data;
+    }
+    // Documento como está armazenado hoje.
+    function prev() {
+      return resource.data;
+    }
+    function inalterado(campo) {
+      return next()[campo] == prev()[campo];
+    }
+    // Texto livre com teto. Campo ausente faz a expressão dar erro de
+    // avaliação, o que NEGA a escrita — é assim que a obrigatoriedade dos
+    // campos é imposta sem um `hasAll` por coleção.
+    function textoAte(valor, maximo) {
+      return valor is string && valor.size() <= maximo;
+    }
+
+    // ---- autorização ------------------------------------------------------
+    // Toda leitura/escrita de pelotoes, evolucoes e partes é autorizada por um
+    // get() no documento do clube. `membrosAtivos` é o índice consultado
+    // justamente para não precisar descer no mapa aninhado `membros`.
+    //
+    // FALHA FECHADA: se o clube não existir, `exists()` é false e a expressão
+    // curto-circuita em negação; mesmo sem ele, get() de documento inexistente
+    // produz erro de avaliação, e erro de avaliação nega. Não há caminho em que
+    // "clube ausente" resulte em acesso liberado.
+
+    function clube(clubId) {
+      return get(/databases/$(database)/documents/clubes/$(clubId)).data;
+    }
+    function membroAtivo(clubId) {
+      return autenticado()
+        && clubId is string
+        && exists(/databases/$(database)/documents/clubes/$(clubId))
+        && uid() in clube(clubId).membrosAtivos
+        && clube(clubId).membrosAtivos[uid()] == true;
+    }
+
+    // ---- clubes -----------------------------------------------------------
+
+    match /clubes/{clubId} {
+
+      // CONTRATO (docs/DADOS.md 3.2). Note o que NÃO está na lista e por quê:
+      // `nomeExibicao` não é campo de documento (é valor dentro de `membros`,
+      // barrado em membrosValidos()), e `photoURL` não é persistido em lugar
+      // nenhum do produto — nem aqui, nem em `membros`.
+      function camposPermitidosClube() {
+        return next().keys().hasOnly([
+          'nome', 'dono', 'membros', 'membrosAtivos', 'criadoEm'
+        ]);
+      }
+
+      // O mapa `membros` existe com UMA entrada só, a do próprio dono. A forma
+      // (mapa chaveado por uid) é o que torna a migração para clubes
+      // multiusuário gratuita — o valor de cada entrada pode crescer depois sem
+      // migração nenhuma, porque é valor de mapa e não campo de documento.
+      //
+      // Por isso `nomeExibicao` está FORA: a tela de aprovação de convite, que
+      // seria a única consumidora dele, não existe nesta versão. Guardar o nome
+      // civil de um adulto para uma funcionalidade inexistente é coleta sem
+      // finalidade. Quando o convite existir, acrescentar a chave custa zero.
+      function membrosValidos() {
+        return next().membros is map
+          && next().membros.keys().hasOnly([next().dono])
+          && next().membros.keys().size() == 1
+          && next().membros[next().dono].keys().hasOnly(['estado', 'papel'])
+          && next().membros[next().dono].estado in ['ativo', 'pendente']
+          && textoAte(next().membros[next().dono].papel, 24);
+      }
+
+      // ---------------------------------------------------------------------
+      // TRAVA DELIBERADA DE SINGLE-USER — não remover por engano
+      // ---------------------------------------------------------------------
+      // `membrosAtivos.keys().size() == 1` não é limitação acidental de um
+      // schema pela metade: é a trava que impede o gatilho 1 de docs/DADOS.md
+      // (seção 8) de ser disparado por acidente.
+      //
+      // O que ela guarda: no instante em que um segundo uid entrar em um clube,
+      // passa a existir dado pessoal de TERCEIRO sob operação da Café Labs. Aí
+      // o enquadramento controlador/operadora deixa de colapsar na mesma
+      // pessoa, e passam a ser exigíveis Termos de Uso, Política de Privacidade
+      // e caminho de exclusão de conta em autoserviço — nenhum dos três existe
+      // hoje.
+      //
+      // Com esta linha, "entrar um segundo usuário" deixa de ser algo que
+      // alguém precisa LEMBRAR DE NOTAR e passa a exigir um commit visível
+      // removendo-a. O gatilho de compliance vira mudança rastreável no git em
+      // vez de disciplina humana.
+      //
+      // Quem for remover: remova junto o `hasOnly([next().dono])` daqui e de
+      // membrosValidos(), e leia antes a seção 8 de docs/DADOS.md.
+      // ---------------------------------------------------------------------
+      function membrosAtivosValidos() {
+        return next().membrosAtivos is map
+          && next().membrosAtivos.keys().hasOnly([next().dono])
+          && next().membrosAtivos.keys().size() == 1
+          && next().membrosAtivos[next().dono] == true;
+      }
+
+      function clubeValido() {
+        return textoAte(next().nome, 60)
+          && next().dono is string
+          && next().criadoEm is timestamp
+          && membrosValidos()
+          && membrosAtivosValidos();
+      }
+
+      // GET: só quem está no mapa `membros` deste clube.
+      allow get: if autenticado() && uid() in prev().membros;
+
+      // LIST: a única consulta suportada é a do próprio usuário procurando os
+      // clubes de que participa. A regra é ancorada no campo consultado, o que
+      // limita estruturalmente o resultado — um estranho não consegue enumerar
+      // clubes alheios.
+      allow list: if autenticado() && uid() in prev().membrosAtivos;
+
+      // CREATE: o criador se semeia como dono e único membro ativo.
+      allow create: if autenticado()
+        && next().dono == uid()
+        && camposPermitidosClube()
+        && clubeValido();
+
+      // UPDATE: só o dono; `dono` e `criadoEm` são imutáveis até para ele.
+      allow update: if autenticado()
+        && prev().dono == uid()
+        && inalterado('dono')
+        && inalterado('criadoEm')
+        && camposPermitidosClube()
+        && clubeValido();
+
+      // DELETE: só o dono. Ver a ordem obrigatória do runbook (DADOS.md 4.1):
+      // este documento sai por ÚLTIMO, depois de partes, evolucoes e pelotoes.
+      allow delete: if autenticado() && prev().dono == uid();
+    }
+
+    // ---- pelotoes ---------------------------------------------------------
+    // A coleção sensível: é a única que guarda dado pessoal de membro do
+    // pelotão (rótulo curto, frequentemente de menor de idade).
+
+    match /pelotoes/{pelotaoId} {
+
+      // CONTRATO (docs/DADOS.md 3.2). É a barreira contra os itens 1–14 da
+      // lista de campos proibidos entrarem "no pelotão, junto com o rótulo".
+      function camposPermitidosPelotao() {
+        return next().keys().hasOnly([
+          'clubId', 'nome', 'linhas', 'colunas', 'rotulos',
+          'criadoEm', 'atualizadoEm'
+        ]);
+      }
+
+      // CONTRATO (docs/DADOS.md 3.2). Entrada única da validação de rótulos.
+      // Delega para rotulosDoMapaValidos(r) passando o mapa UMA vez: avaliar
+      // `next().rotulos` 36 vezes custaria ~3 expressões extras por slot, e o
+      // orçamento aqui é apertado (ver bloco ORÇAMENTO abaixo).
+      function rotulosValidos() {
+        return next().rotulos is map && rotulosDoMapaValidos(next().rotulos);
+      }
+
+      // ---------------------------------------------------------------------
+      // ORÇAMENTO DE EXPRESSÕES — por que 36 é quase o teto técnico, não só o
+      // teto de produto
+      // ---------------------------------------------------------------------
+      // Security Rules não têm laço, então cada slot é uma verificação
+      // desenrolada, e o Firestore corta em 1.000 EXPRESSÕES AVALIADAS POR
+      // REQUEST. Medido no emulador (ver test/rules/README.md, seção
+      // "Orçamento de expressões"), com o pior caso real — os 36 slots
+      // preenchidos com 24 caracteres cada:
+      //
+      //   capacidade máxima desta regra ...... 44 slots
+      //   em uso hoje ........................ 36 slots
+      //   folga .............................. 8 slots (~14% do orçamento)
+      //
+      // Consequência prática, que é o motivo deste bloco existir: um grid
+      // 7×7 (49 slots) NÃO CABE. Aumentar o grid não é mexer em dois números
+      // de `linhas`/`colunas` — exige reformular esta validação (por exemplo,
+      // trocar o `is string` explícito por um guard de concatenação, medido em
+      // 67 slots de capacidade, ao custo de divergir do texto de DADOS.md
+      // 3.2), ou mover os rótulos para fora deste documento.
+      //
+      // Se esta regra crescer (campo novo, validação nova), a folga encolhe.
+      // O teste "os 36 slots cheios cabem no orçamento de expressões" existe
+      // para que isso apareça como teste vermelho, e não como escrita negada
+      // em produção com 36 crianças já cadastradas.
+      // ---------------------------------------------------------------------
+      //
+      // Um slot ausente é válido (grid parcialmente preenchido): `get(slot,
+      // '')` devolve a string vazia, que passa. Presente, precisa ser string
+      // de no máximo 24 caracteres — o `is string` não é decorativo: sem ele,
+      // um MAPA aninhado de até 24 chaves passaria no `size()` e viraria porta
+      // para dado arbitrário dentro do rótulo.
+      //
+      // O teto de 24 limita TAMANHO, não semântica: "Maria Eduarda Santos" tem
+      // 20 caracteres e passa. O que ele impede é o rótulo virar campo de texto
+      // livre disfarçado. Não se pode afirmar que a regra impõe
+      // pseudonimização — ver docs/DADOS.md 3.3(a).
+      //
+      // O `hasOnly` da primeira linha é o que impede uma chave ser o próprio
+      // rótulo (nome de pessoa como chave de mapa apareceria em índice, em
+      // export e em qualquer log de query); as 36 linhas seguintes impõem o
+      // teto de tamanho.
+      function rotulosDoMapaValidos(r) {
+        return r.keys().hasOnly([
+            '0',  '1',  '2',  '3',  '4',  '5',  '6',  '7',  '8',  '9',
+            '10', '11', '12', '13', '14', '15', '16', '17', '18', '19',
+            '20', '21', '22', '23', '24', '25', '26', '27', '28', '29',
+            '30', '31', '32', '33', '34', '35'
+          ])
+          && (r.get('0',  '') is string && r.get('0',  '').size() <= 24)
+          && (r.get('1',  '') is string && r.get('1',  '').size() <= 24)
+          && (r.get('2',  '') is string && r.get('2',  '').size() <= 24)
+          && (r.get('3',  '') is string && r.get('3',  '').size() <= 24)
+          && (r.get('4',  '') is string && r.get('4',  '').size() <= 24)
+          && (r.get('5',  '') is string && r.get('5',  '').size() <= 24)
+          && (r.get('6',  '') is string && r.get('6',  '').size() <= 24)
+          && (r.get('7',  '') is string && r.get('7',  '').size() <= 24)
+          && (r.get('8',  '') is string && r.get('8',  '').size() <= 24)
+          && (r.get('9',  '') is string && r.get('9',  '').size() <= 24)
+          && (r.get('10', '') is string && r.get('10', '').size() <= 24)
+          && (r.get('11', '') is string && r.get('11', '').size() <= 24)
+          && (r.get('12', '') is string && r.get('12', '').size() <= 24)
+          && (r.get('13', '') is string && r.get('13', '').size() <= 24)
+          && (r.get('14', '') is string && r.get('14', '').size() <= 24)
+          && (r.get('15', '') is string && r.get('15', '').size() <= 24)
+          && (r.get('16', '') is string && r.get('16', '').size() <= 24)
+          && (r.get('17', '') is string && r.get('17', '').size() <= 24)
+          && (r.get('18', '') is string && r.get('18', '').size() <= 24)
+          && (r.get('19', '') is string && r.get('19', '').size() <= 24)
+          && (r.get('20', '') is string && r.get('20', '').size() <= 24)
+          && (r.get('21', '') is string && r.get('21', '').size() <= 24)
+          && (r.get('22', '') is string && r.get('22', '').size() <= 24)
+          && (r.get('23', '') is string && r.get('23', '').size() <= 24)
+          && (r.get('24', '') is string && r.get('24', '').size() <= 24)
+          && (r.get('25', '') is string && r.get('25', '').size() <= 24)
+          && (r.get('26', '') is string && r.get('26', '').size() <= 24)
+          && (r.get('27', '') is string && r.get('27', '').size() <= 24)
+          && (r.get('28', '') is string && r.get('28', '').size() <= 24)
+          && (r.get('29', '') is string && r.get('29', '').size() <= 24)
+          && (r.get('30', '') is string && r.get('30', '').size() <= 24)
+          && (r.get('31', '') is string && r.get('31', '').size() <= 24)
+          && (r.get('32', '') is string && r.get('32', '').size() <= 24)
+          && (r.get('33', '') is string && r.get('33', '').size() <= 24)
+          && (r.get('34', '') is string && r.get('34', '').size() <= 24)
+          && (r.get('35', '') is string && r.get('35', '').size() <= 24);
+      }
+
+      function pelotaoValido() {
+        return next().clubId is string
+          && textoAte(next().nome, 60)
+          && next().linhas is int && next().linhas >= 1 && next().linhas <= 6
+          && next().colunas is int && next().colunas >= 1 && next().colunas <= 6
+          && next().criadoEm is timestamp
+          && next().atualizadoEm is timestamp
+          && rotulosValidos();
+      }
+
+      allow read: if membroAtivo(resource.data.clubId);
+
+      allow create: if membroAtivo(next().clubId)
+        && camposPermitidosPelotao()
+        && pelotaoValido();
+
+      // A validação de rótulo roda no UPDATE também, não só no create — senão
+      // o teto de 24 seria contornável por qualquer escrita posterior.
+      allow update: if membroAtivo(prev().clubId)
+        && inalterado('clubId')
+        && inalterado('criadoEm')
+        && camposPermitidosPelotao()
+        && pelotaoValido();
+
+      allow delete: if membroAtivo(prev().clubId);
+    }
+
+    // ---- evolucoes --------------------------------------------------------
+
+    match /evolucoes/{evolucaoId} {
+
+      // CONTRATO (docs/DADOS.md 3.2).
+      function camposPermitidosEvolucao() {
+        return next().keys().hasOnly([
+          'clubId', 'pelotaoId', 'nome', 'estadoInicial', 'campo',
+          'versaoCatalogo', 'criadoEm', 'atualizadoEm'
+        ]);
+      }
+
+      // `campo` é o maior risco de dado pessoal acidental do schema inteiro
+      // ("pátio da casa do sicrano"). Por isso ele é MAPA DE DOIS INTEIROS, e
+      // nunca texto livre: uma string aqui é rejeitada pelo servidor, não
+      // apenas desencorajada pela interface.
+      function campoValido() {
+        return !('campo' in next())
+          || (next().campo is map
+            && next().campo.keys().hasOnly(['larguraCelulas', 'alturaCelulas'])
+            && next().campo.larguraCelulas is int
+            && next().campo.larguraCelulas >= 1
+            && next().campo.larguraCelulas <= 200
+            && next().campo.alturaCelulas is int
+            && next().campo.alturaCelulas >= 1
+            && next().campo.alturaCelulas <= 200);
+      }
+
+      // As CHAVES de `estadoInicial.slots` são índices de slot, nunca rótulo —
+      // é essa propriedade que faz esta coleção não conter dado pessoal
+      // (docs/DADOS.md 2.4). O `hasOnly` abaixo impõe isso no servidor. O
+      // INTERIOR de cada slot não é validado (ver LIMITAÇÃO CONHECIDA no topo).
+      function estadoInicialValido() {
+        return next().estadoInicial is map
+          && next().estadoInicial.keys().hasOnly(['slots'])
+          && next().estadoInicial.slots is map
+          && next().estadoInicial.slots.keys().hasOnly([
+            '0',  '1',  '2',  '3',  '4',  '5',  '6',  '7',  '8',  '9',
+            '10', '11', '12', '13', '14', '15', '16', '17', '18', '19',
+            '20', '21', '22', '23', '24', '25', '26', '27', '28', '29',
+            '30', '31', '32', '33', '34', '35'
+          ]);
+      }
+
+      function evolucaoValida() {
+        return next().clubId is string
+          && next().pelotaoId is string
+          && textoAte(next().nome, 80)
+          && next().versaoCatalogo is int
+          && next().versaoCatalogo >= 1
+          && next().criadoEm is timestamp
+          && next().atualizadoEm is timestamp
+          && estadoInicialValido()
+          && campoValido();
+      }
+
+      allow read: if membroAtivo(resource.data.clubId);
+
+      allow create: if membroAtivo(next().clubId)
+        && camposPermitidosEvolucao()
+        && evolucaoValida();
+
+      allow update: if membroAtivo(prev().clubId)
+        && inalterado('clubId')
+        && inalterado('criadoEm')
+        && camposPermitidosEvolucao()
+        && evolucaoValida();
+
+      allow delete: if membroAtivo(prev().clubId);
+    }
+
+    // ---- partes -----------------------------------------------------------
+
+    match /partes/{parteId} {
+
+      // CONTRATO (docs/DADOS.md 3.2).
+      function camposPermitidosParte() {
+        return next().keys().hasOnly([
+          'clubId', 'evolucaoId', 'ordem', 'nome', 'atribuicoes',
+          'atualizadoEm'
+        ]);
+      }
+
+      // Chaveado por ÍNDICE DE SLOT, nunca por rótulo — o `hasOnly` impõe isso.
+      // O interior de cada atribuição não é validado: ver LIMITAÇÃO CONHECIDA
+      // no topo deste arquivo.
+      function atribuicoesValidas() {
+        return next().atribuicoes is map
+          && next().atribuicoes.keys().hasOnly([
+            '0',  '1',  '2',  '3',  '4',  '5',  '6',  '7',  '8',  '9',
+            '10', '11', '12', '13', '14', '15', '16', '17', '18', '19',
+            '20', '21', '22', '23', '24', '25', '26', '27', '28', '29',
+            '30', '31', '32', '33', '34', '35'
+          ]);
+      }
+
+      function parteValida() {
+        return next().clubId is string
+          && next().evolucaoId is string
+          // `ordem` é fracionária (reordenação por inserção entre dois
+          // vizinhos), então é number e não int. A faixa exclui NaN de graça:
+          // toda comparação com NaN é falsa, então um NaN reprova aqui.
+          && next().ordem is number
+          && next().ordem >= -1000000000
+          && next().ordem <= 1000000000
+          && (!('nome' in next()) || textoAte(next().nome, 60))
+          && next().atualizadoEm is timestamp
+          && atribuicoesValidas();
+      }
+
+      allow read: if membroAtivo(resource.data.clubId);
+
+      allow create: if membroAtivo(next().clubId)
+        && camposPermitidosParte()
+        && parteValida();
+
+      allow update: if membroAtivo(prev().clubId)
+        && inalterado('clubId')
+        && inalterado('evolucaoId')
+        && camposPermitidosParte()
+        && parteValida();
+
+      allow delete: if membroAtivo(prev().clubId);
+    }
+
+    // ---- catch-all --------------------------------------------------------
+    // Redundante por construção (o default do Firestore já é negar tudo que
+    // não foi liberado), e escrito mesmo assim: um path novo que apareça no
+    // código sem regra correspondente encosta AQUI, e a negação fica legível
+    // como decisão em vez de como omissão. Regra de manutenção: path novo entra
+    // em docs/DADOS.md no mesmo commit (seção 9).
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

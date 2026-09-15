@@ -43,6 +43,8 @@ falha. Entusiasmo de quem assiste é sinal, não uso.
 ```
 packages/evo_motor/   motor de simulação — Dart puro, sem Flutter, sem Firebase
 app/                  aplicação Flutter Web (playback)
+firestore.rules       Security Rules — o enforcement de docs/DADOS.md
+test/rules/           testes das regras contra o emulador (harness Node isolado)
 ```
 
 O motor é deliberadamente isolado: nenhuma dependência de UI ou de rede, todas
@@ -57,7 +59,16 @@ cd packages/evo_motor && dart test
 
 # aplicação
 cd app && flutter run -d chrome
+
+# testes das Security Rules, contra o emulador local (nunca produção)
+cd test/rules && npm install && cd ../..
+firebase emulators:exec --only firestore --project evo-rules-test \
+  "npm --prefix test/rules test"
 ```
+
+Os testes de regra não dependem de nenhum projeto Firebase real e não entram em
+`dart test` nem em `flutter test`. Detalhes, cobertura e o orçamento de
+expressões medido: [`test/rules/README.md`](test/rules/README.md).
 
 ## Modelo
 

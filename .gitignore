@@ -6,6 +6,17 @@
 .flutter-plugins-dependencies
 build/
 
+# Harness de testes das Security Rules (test/rules/) — Node, isolado do app.
+node_modules/
+
+# Firebase local: logs do emulador e cache de deploy. `firebase.json`,
+# `firestore.rules` e `firestore.indexes.json` SÃO versionados.
+.firebase/
+*-debug.log
+firestore-debug.log
+firebase-debug.log
+ui-debug.log
+
 # IDEs
 .idea/
 *.iml
