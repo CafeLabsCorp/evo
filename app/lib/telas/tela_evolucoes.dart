@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../dados/controle_edicao.dart';
 import '../dados/export_json.dart';
 import '../dados/repositorio_evo.dart';
 import '../tema/paleta.dart';
 import '../util/exportar_evolucao.dart';
+import 'tela_editor_partes.dart';
 import 'tela_playback_nuvem.dart';
 import 'widgets_estado.dart';
 
@@ -63,6 +65,19 @@ class TelaEvolucoes extends StatelessWidget {
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
+                          IconButton(
+                            tooltip: 'Editar partes',
+                            icon: const Icon(Icons.edit_outlined, color: Paleta.cinzaMedio),
+                            onPressed: () => Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) => TelaEditorPartes(
+                                  repo: repo,
+                                  evolucaoId: r.id,
+                                  controleEdicao: const TravaSempreMinha(),
+                                ),
+                              ),
+                            ),
+                          ),
                           IconButton(
                             tooltip: 'Exportar (JSON)',
                             icon: const Icon(Icons.download_outlined, color: Paleta.cinzaMedio),
