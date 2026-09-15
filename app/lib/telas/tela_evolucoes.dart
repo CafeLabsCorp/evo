@@ -5,6 +5,7 @@ import '../dados/export_json.dart';
 import '../dados/repositorio_evo.dart';
 import '../tema/paleta.dart';
 import '../util/exportar_evolucao.dart';
+import 'tela_criar_evolucao.dart';
 import 'tela_editor_partes.dart';
 import 'tela_playback_nuvem.dart';
 import 'widgets_estado.dart';
@@ -41,12 +42,18 @@ class TelaEvolucoes extends StatelessWidget {
                   if (r.pelotaoId == pelotao.id) r,
               ];
               if (destePelotao.isEmpty) {
-                return const CentroVazio(
+                return CentroVazio(
                   icone: Icons.movie_creation_outlined,
                   titulo: 'Nenhuma evolução ainda',
                   descricao:
-                      'O editor de evoluções chega em breve. Por enquanto, esta '
-                      'tela só mostra e reproduz evoluções já existentes.',
+                      'Crie a primeira evolução deste pelotão para começar a '
+                      'montar movimentos.',
+                  acao: FilledButton.icon(
+                    style: FilledButton.styleFrom(backgroundColor: Paleta.acento),
+                    onPressed: () => _criar(context),
+                    icon: const Icon(Icons.add),
+                    label: const Text('Criar evolução'),
+                  ),
                 );
               }
               return ListView.builder(
@@ -102,8 +109,19 @@ class TelaEvolucoes extends StatelessWidget {
               );
             },
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _criar(context),
+        icon: const Icon(Icons.add),
+        label: const Text('Nova evolução'),
+      ),
     );
   }
+
+  void _criar(BuildContext context) => Navigator.of(context).push(
+    MaterialPageRoute<void>(
+      builder: (_) => TelaCriarEvolucao(repo: repo, pelotao: pelotao),
+    ),
+  );
 
   Future<void> _exportar(BuildContext context, String evolucaoId) async {
     final ScaffoldMessengerState mensageiro = ScaffoldMessenger.of(context);
