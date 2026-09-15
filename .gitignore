@@ -39,3 +39,7 @@ ui-debug.log
 **/*-firebase-adminsdk-*.json
 **/app_check_debug_token*
 evo-lab-backup-*.json
+
+# Screenshots de verificação ponta a ponta: artefato local de depuração,
+# não documentação. Repositório público — nada de captura de tela entra aqui.
+docs/e2e-*/
