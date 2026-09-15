@@ -121,10 +121,51 @@ class FormacaoPainter extends CustomPainter {
     required this.enquadramento,
     this.mostrarLinhas = false,
     this.mostrarPontos = true,
+    this.modoEditor = false,
+    this.slotsSelecionados = const <int>{},
+    this.slotsComContinuacao = const <int>{},
+    this.slotsComPercussaoEditor = const <int>{},
   });
 
   final List<EstadoRenderizado> estados;
   final Campo campo;
+
+  /// Modo do editor de partes (grid touch-first) — correção de
+  /// 2026-09-15: até aqui, `pintura/pintura_slot_editor.dart` (removido)
+  /// desenhava o editor sobre um layout FIXO por índice de slot, sempre
+  /// "para cima" — o instrutor montava uma parte sem ver direção nem
+  /// posição real. Este painter já resolve "formação que não é mais um
+  /// retângulo" (enquadramento automático) para o playback; reaproveitá-lo
+  /// para o editor, em vez de duplicar um segundo `CustomPainter`, é só
+  /// questão de acrescentar as três informações que só o editor precisa —
+  /// seleção, continuação implícita, percussão ESTÁTICA — como parâmetro,
+  /// nunca como um arquivo novo.
+  ///
+  /// `false` (default, playback) preserva o comportamento anterior:
+  /// arco/anel de destaque de batida ANIMADOS (a partir de [batidas] de
+  /// cada [EstadoRenderizado]), sem seleção, sem quadrado de continuação.
+  /// `true` (editor) desliga o destaque animado — o editor não toca
+  /// eventos, só mostra um frame estático — e liga os três indicadores
+  /// abaixo.
+  final bool modoEditor;
+
+  /// Slots destacados como SELECIONADOS na tela do editor — ignorado fora
+  /// de [modoEditor].
+  final Set<int> slotsSelecionados;
+
+  /// Slots que RECEBERAM atribuição explícita na parte em edição (por
+  /// oposição a "continuação implícita da parte anterior") — mesmo
+  /// significado e mesma posição (canto inferior esquerdo) do quadrado
+  /// ciano que `pintura_slot_editor.dart` desenhava. Ignorado fora de
+  /// [modoEditor].
+  final Set<int> slotsComContinuacao;
+
+  /// Slots com percussão atribuída na parte em edição. Ponto ESTÁTICO
+  /// (canto inferior direito) — não o arco animado de [batidas], que é
+  /// sobre EVENTOS de reprodução (um conceito que não existe no editor:
+  /// aqui é só "esta atribuição tem ou não tem percussão"). Ignorado fora
+  /// de [modoEditor].
+  final Set<int> slotsComPercussaoEditor;
 
   /// Bounding box (linha/coluna, em células, SEM margem ainda) de todas as
   /// posições ocupadas ao longo de toda a faixa em reprodução atual —
@@ -181,12 +222,27 @@ class FormacaoPainter extends CustomPainter {
   /// [mostrarLinhas].
   final bool mostrarPontos;
 
-  Offset _paraTela(Size size, double linha, double coluna) {
-    final Offset centro = Offset(size.width / 2, size.height / 2);
+  Offset _paraTela(Size size, double linha, double coluna) =>
+      converterParaTela(size, _transformacao, linha, coluna);
+
+  /// Converte (linha, coluna) em células para um `Offset` de tela, dada
+  /// uma [TransformacaoEnquadramento] já calculada — extraído como método
+  /// ESTÁTICO (não mais só um detalhe privado de instância) porque o
+  /// editor de partes precisa da mesma conversão para hit-testing por
+  /// proximidade (toque -> slot mais próximo) e para posicionar os rótulos
+  /// de nome sobre cada silhueta; nenhum dos dois lados pode ter sua
+  /// própria cópia da matemática sem arriscar as duas divergirem.
+  static Offset converterParaTela(
+    Size tela,
+    TransformacaoEnquadramento transformacao,
+    double linha,
+    double coluna,
+  ) {
+    final Offset centro = Offset(tela.width / 2, tela.height / 2);
     return centro +
         Offset(
-          (coluna - _transformacao.centroColuna) * _transformacao.tamanhoCelulaPx,
-          (linha - _transformacao.centroLinha) * _transformacao.tamanhoCelulaPx,
+          (coluna - transformacao.centroColuna) * transformacao.tamanhoCelulaPx,
+          (linha - transformacao.centroLinha) * transformacao.tamanhoCelulaPx,
         );
   }
 
@@ -313,6 +369,13 @@ class FormacaoPainter extends CustomPainter {
 
     _desenharLinhaImaginariaSeNecessario(canvas, size, e);
 
+    // Destaque de SELEÇÃO (só editor) é desenhado ANTES da silhueta, de
+    // propósito: é um halo atrás da pessoa, nunca algo que compete com o
+    // corpo/badge por cima dela.
+    if (modoEditor && slotsSelecionados.contains(e.slot)) {
+      _desenharDestaqueSelecaoEditor(canvas, centro);
+    }
+
     canvas.save();
     canvas.translate(centro.dx, centro.dy);
     canvas.rotate(grausParaRadianos(e.anguloGraus));
@@ -323,20 +386,75 @@ class FormacaoPainter extends CustomPainter {
 
     canvas.restore();
 
-    // Anel/arco de destaque de batida e badge de cadência são desenhados
-    // FORA do referencial rotacionado, de propósito: precisam continuar
-    // legíveis (e, no caso do anel, geometricamente corretos — um círculo
-    // não muda com rotação) não importa o facing atual. O arco de
-    // percussão É relativo ao facing (ver [tipoBatidaParaDesenhar] e
-    // [_desenharArcoPercussao]), mas o cálculo do ângulo já incorpora
-    // `e.anguloGraus` explicitamente — não depende do `save`/`restore`.
-    final TipoBatida? destaque = tipoBatidaParaDesenhar(e.batidas);
-    if (destaque == TipoBatida.passo) {
-      _desenharAnelDestaque(canvas, centro);
-    } else if (destaque != null) {
-      _desenharArcoPercussao(canvas, centro, destaque, e.anguloGraus);
+    // Anel/arco de destaque de batida, quadrado de continuação e badge de
+    // cadência são desenhados FORA do referencial rotacionado, de
+    // propósito: precisam continuar legíveis (e, no caso do anel/quadrado,
+    // geometricamente corretos) não importa o facing atual. O arco de
+    // percussão do PLAYBACK É relativo ao facing (ver
+    // [tipoBatidaParaDesenhar] e [_desenharArcoPercussao]), mas o cálculo
+    // do ângulo já incorpora `e.anguloGraus` explicitamente — não depende
+    // do `save`/`restore`.
+    if (modoEditor) {
+      // Editor: nenhum evento de reprodução existe aqui (é um frame
+      // estático, não uma animação) — os indicadores são sempre os
+      // mesmos três que `pintura_slot_editor.dart` desenhava sobre o
+      // layout fixo, agora sobre a posição REAL.
+      if (slotsComContinuacao.contains(e.slot)) {
+        _desenharQuadradoContinuacaoEditor(canvas, centro);
+      }
+      if (slotsComPercussaoEditor.contains(e.slot)) {
+        _desenharMarcaPercussaoEditor(canvas, centro);
+      }
+    } else {
+      final TipoBatida? destaque = tipoBatidaParaDesenhar(e.batidas);
+      if (destaque == TipoBatida.passo) {
+        _desenharAnelDestaque(canvas, centro);
+      } else if (destaque != null) {
+        _desenharArcoPercussao(canvas, centro, destaque, e.anguloGraus);
+      }
     }
     _desenharBadgeCadencia(canvas, centro, estilo);
+  }
+
+  /// Halo de seleção do editor — círculo translúcido + anel, desenhado em
+  /// espaço de TELA (não rotaciona com o facing, como o anel de destaque
+  /// de batida do playback). Mesmo raio de referência do anel de passo
+  /// (`_escalar(17)`, dentro da janela segura documentada em
+  /// [_desenharAnelDestaque]) para não competir com o quadrado de
+  /// continuação/marca de percussão nos cantos inferiores.
+  void _desenharDestaqueSelecaoEditor(Canvas canvas, Offset centro) {
+    final double raio = _escalar(17);
+    canvas.drawCircle(centro, raio, Paint()..color = _corDestaque.withValues(alpha: 0.22));
+    canvas.drawCircle(
+      centro,
+      raio,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = _escalar(1.5)
+        ..color = _corDestaque,
+    );
+  }
+
+  /// Quadrado ciano — canto inferior ESQUERDO, mesma geometria e mesmo
+  /// motivo de `pintura_slot_editor.dart` (removido nesta correção):
+  /// "recebeu instrução nesta parte" precisa de forma e posição própria
+  /// (nunca uma variação de cor) para se distinguir do badge de cadência
+  /// mesmo quando todo mundo está na mesma cadência.
+  void _desenharQuadradoContinuacaoEditor(Canvas canvas, Offset centro) {
+    final Offset centroMarca = centro + Offset(_escalar(-6), _escalar(8));
+    final double lado = _escalar(7);
+    canvas.drawRect(
+      Rect.fromCenter(center: centroMarca, width: lado, height: lado),
+      Paint()..color = _corDestaque,
+    );
+  }
+
+  /// Pontinho — canto inferior DIREITO, mesma posição/motivo de
+  /// `pintura_slot_editor.dart`: só "tem ou não tem" percussão nesta
+  /// atribuição; qual membro é texto no painel, não geometria aqui.
+  void _desenharMarcaPercussaoEditor(Canvas canvas, Offset centro) {
+    final Offset p = centro + Offset(_escalar(6), _escalar(8));
+    canvas.drawCircle(p, _escalar(2.5), Paint()..color = _corDestaque);
   }
 
   /// Contorno fino, decorativo e CONSTANTE — nunca varia por estado
@@ -601,9 +719,14 @@ class FormacaoPainter extends CustomPainter {
 
 /// Escala (px por célula) e centro (em células) usados por [FormacaoPainter]
 /// pra converter linha/coluna em pixels de tela — extraído em função pura
-/// só pra poder testar a matemática de enquadramento sem montar um `Canvas`
-/// de verdade.
-@visibleForTesting
+/// para poder ser testado sem montar um `Canvas` de verdade, E (desde a
+/// correção do editor de partes de 2026-09-15) para ser reaproveitado por
+/// código de produção fora do painter: `_GradeFormacaoEditor` precisa da
+/// MESMA transformação para converter um toque na tela em (linha, coluna) —
+/// hit-testing por proximidade, já que com gente fora dos cruzamentos do
+/// grid original "que slot está aqui" deixa de ser divisão inteira. Por
+/// isso não é mais `@visibleForTesting`: tem um consumidor de produção
+/// legítimo, não só os testes deste arquivo.
 class TransformacaoEnquadramento {
   const TransformacaoEnquadramento({
     required this.tamanhoCelulaPx,

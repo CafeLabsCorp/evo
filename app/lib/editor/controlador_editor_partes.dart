@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 
 import '../dados/controle_edicao.dart';
 import '../dados/ordem_fracionaria.dart';
+import '../dados/ordenacao_partes.dart';
 import '../dados/repositorio_evo.dart';
 import 'descritores_movimento.dart';
 
@@ -210,6 +211,112 @@ class ControladorEditorPartes extends ChangeNotifier {
     final int? i = _indiceSelecionado;
     if (i == null) return Cadencia.firme;
     return cadenciaAntesDaParte(i)[slot] ?? Cadencia.firme;
+  }
+
+  // ---- estado de ENTRADA da parte selecionada (posição + direção reais,
+  // não só cadência) — correção de 2026-09-15 ------------------------------
+  //
+  // Até esta correção o grid do editor desenhava todo mundo "para cima",
+  // na célula fixa do slot — o instrutor montava uma parte sem ver pra
+  // onde as pessoas estavam viradas nem onde elas estavam de verdade. O
+  // motor já entrega isso de graça: `simular(estadoInicial,
+  // partes[0..k-1])` produz o estado ao final da parte anterior, que É o
+  // estado de entrada da parte `k` (caso trivial: `k == 0` não tem parte
+  // anterior, o estado de entrada é o `estadoInicial` gravado da
+  // evolução).
+  //
+  // Isto é DELIBERADAMENTE um cache separado de [cadenciaAntesDaParte]
+  // (que continua existindo, inalterado, para o painel de atribuição): a
+  // função antiga é uma réplica manual e barata só da CADÊNCIA, pensada
+  // para ser chamada uma vez por slot a cada rebuild do painel/seleção;
+  // este cache guarda o [EstadoFormacao] inteiro (posição+direção+
+  // cadência) vindo do `simular` de verdade, e é uso mais pesado o
+  // suficiente para precisar de cache explícito por índice de parte — ver
+  // o aviso de custo abaixo.
+  //
+  // CUSTO: editar a parte K (escolher movimento, ajustar parâmetro, etc.)
+  // NUNCA muda o estado de ENTRADA dela — só o de K+1 em diante. Por isso
+  // este cache só é invalidado por MUDANÇA DE SELEÇÃO ou por uma mudança
+  // real no conteúdo de alguma parte ANTERIOR ao índice selecionado
+  // (outra sessão editou, undo, duplicar, renormalização de ordens) —
+  // nunca a cada toque no painel da parte atual. A checagem de validade é
+  // uma ASSINATURA barata (id + `atualizadoEm` de cada parte antes do
+  // índice, mais o `atualizadoEm` da evolução) — nunca o conteúdo inteiro
+  // das atribuições — então "reler a cada rebuild" é seguro: só quando a
+  // assinatura muda é que `simular` roda de novo.
+  int? _indiceCacheEntrada;
+  List<String> _assinaturaCacheEntrada = const <String>[];
+  EstadoFormacao? _estadoEntradaCache;
+  List<Diagnostico> _diagnosticosEntradaCache = const <Diagnostico>[];
+
+  List<String> _assinaturaEntrada(int indice) => <String>[
+    if (_evolucao != null) 'evo@${_evolucao!.atualizadoEm.microsecondsSinceEpoch}',
+    for (int i = 0; i < indice && i < _partes.length; i++)
+      '${_partes[i].id}@${_partes[i].atualizadoEm.microsecondsSinceEpoch}',
+  ];
+
+  bool _assinaturasIguais(List<String> a, List<String> b) {
+    if (a.length != b.length) return false;
+    for (int i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
+  }
+
+  void _garantirCacheEntrada(int indice) {
+    final List<String> assinatura = _assinaturaEntrada(indice);
+    if (_indiceCacheEntrada == indice &&
+        _assinaturasIguais(_assinaturaCacheEntrada, assinatura)) {
+      return; // cache válido — nada para recomputar.
+    }
+    _indiceCacheEntrada = indice;
+    _assinaturaCacheEntrada = assinatura;
+
+    final EvolucaoDoc? evo = _evolucao;
+    if (evo == null) {
+      _estadoEntradaCache = null;
+      _diagnosticosEntradaCache = const <Diagnostico>[];
+      return;
+    }
+    final EstadoFormacao inicial = estadoFormacaoDoJson(evo.estadoInicial);
+    if (indice <= 0) {
+      // Primeira parte: sem parte anterior — o estado de entrada é o
+      // `estadoInicial` gravado da evolução, tratado explicitamente (não
+      // um caso degenerado de `simular` com lista vazia, embora desse na
+      // mesma: fica claro na leitura que é intencional).
+      _estadoEntradaCache = inicial;
+      _diagnosticosEntradaCache = const <Diagnostico>[];
+      return;
+    }
+    final List<Parte> anteriores = emOrdem(_partes.sublist(0, indice));
+    final ResultadoSimulacao resultado = simular(inicial, anteriores);
+    _estadoEntradaCache = resultado.estadoFinal(inicial);
+    _diagnosticosEntradaCache = resultado.diagnosticos;
+  }
+
+  /// Estado de entrada (posição/direção/cadência REAIS, uma por slot) da
+  /// parte selecionada — `null` só quando não há evolução carregada ou
+  /// nenhuma parte selecionada. Nunca inventado/aproximado: é sempre o que
+  /// `simular` produziu para o fim da parte anterior (ou `estadoInicial`
+  /// para a primeira parte).
+  EstadoFormacao? get estadoEntradaSelecionada {
+    final int? i = _indiceSelecionado;
+    if (i == null) return null;
+    _garantirCacheEntrada(i);
+    return _estadoEntradaCache;
+  }
+
+  /// Diagnósticos (comando impossível, colisão, fora dos limites) que a
+  /// simulação até a parte ANTERIOR à selecionada já produziu. Não-vazio
+  /// significa "o estado de entrada mostrado no grid parte de algo que o
+  /// motor já considera problemático" — a tela mostra isto sempre, nunca
+  /// esconde nem aborta (mesma disciplina das quatro checagens do motor:
+  /// nunca abortam a simulação, só se acumulam para quem vê decidir).
+  List<Diagnostico> get diagnosticosEntradaSelecionada {
+    final int? i = _indiceSelecionado;
+    if (i == null) return const <Diagnostico>[];
+    _garantirCacheEntrada(i);
+    return _diagnosticosEntradaCache;
   }
 
   /// Lê de [atribuicoesEfetivas] (buffer se houver, senão o doc do stream)

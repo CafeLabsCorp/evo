@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evo_app/dados/controle_edicao.dart';
 import 'package:evo_app/dados/repositorio_evo.dart';
 import 'package:evo_app/dados/repositorio_evo_firestore.dart';
-import 'package:evo_app/editor/pintura_slot_editor.dart';
+import 'package:evo_app/pintura/formacao_painter.dart';
 import 'package:evo_app/telas/tela_editor_partes.dart';
 import 'package:evo_motor/evo_motor.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
@@ -145,15 +145,18 @@ void main() {
       await tester.tap(find.widgetWithText(ChoiceChip, 'Sentido'));
       await tester.pumpAndSettle();
 
-      final List<SlotEditorPainter> pintores = tester
+      final List<FormacaoPainter> pintores = tester
           .widgetList<CustomPaint>(find.byType(CustomPaint))
           .map((CustomPaint c) => c.painter)
-          .whereType<SlotEditorPainter>()
+          .whereType<FormacaoPainter>()
           .toList();
+      expect(pintores, hasLength(1));
       // 3 slots da fileira 1 receberam atribuição explícita nesta parte;
-      // os 6 restantes continuam em continuação implícita.
-      expect(pintores.where((SlotEditorPainter p) => p.recebeuInstrucao).length, 3);
-      expect(pintores.where((SlotEditorPainter p) => !p.recebeuInstrucao).length, 6);
+      // os 6 restantes continuam em continuação implícita — agora
+      // representado como um SET de slots no painter em modo editor
+      // (ver `FormacaoPainter.slotsComContinuacao`), não mais uma flag
+      // por instância de painter (um painter por slot, no grid antigo).
+      expect(pintores.single.slotsComContinuacao, unorderedEquals(<int>[0, 1, 2]));
     });
   });
 

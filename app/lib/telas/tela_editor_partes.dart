@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:evo_motor/evo_motor.dart';
 import 'package:flutter/material.dart';
@@ -9,8 +10,8 @@ import '../dados/ordenacao_partes.dart';
 import '../dados/repositorio_evo.dart';
 import '../editor/controlador_editor_partes.dart';
 import '../editor/descritores_movimento.dart';
-import '../editor/pintura_slot_editor.dart';
 import '../modelo/carregador_evolucao.dart';
+import '../pintura/formacao_painter.dart';
 import '../playback/controlador_playback.dart';
 import '../tema/paleta.dart';
 import 'tela_playback.dart';
@@ -791,10 +792,20 @@ class _Chip extends StatelessWidget {
   }
 }
 
-/// O grid touch-first: um slot por célula, selecionável, mostrando
-/// cadência (badge), continuação implícita (quadrado ciano) e percussão
-/// (pontinho). Sempre lay-out FIXO por índice de slot — nunca a posição
-/// física simulada (slot é identidade, não localização).
+/// O grid do editor — correção de 2026-09-15: até aqui isto era um layout
+/// FIXO por índice de slot, sempre desenhado "para cima" (facing nunca
+/// acumulava giro parte a parte). O instrutor montava uma parte sem ver
+/// pra onde as pessoas estavam viradas nem onde elas estavam de verdade —
+/// exatamente a classe de erro que só aparece no ensaio.
+///
+/// Agora mostra o ESTADO DE ENTRADA real da parte selecionada (posição +
+/// direção + cadência), obtido de [ControladorEditorPartes.
+/// estadoEntradaSelecionada] — que é literalmente `simular(estadoInicial,
+/// partes[0..k-1])`, nunca um valor aproximado. Continua valendo a
+/// distinção do motor: **slot é identidade, não localização** — os chips
+/// de "Fileira N"/"Coluna N" (`_BarraSelecao`) continuam operando sobre o
+/// grid ORIGINAL do pelotão; é só o DESENHO que passou a refletir onde a
+/// pessoa está de verdade.
 class _GradeSlots extends StatelessWidget {
   const _GradeSlots({required this.controlador});
   final ControladorEditorPartes controlador;
@@ -809,83 +820,247 @@ class _GradeSlots extends StatelessWidget {
         descricao: 'Toque em "+" na fileira acima para criar a primeira parte.',
       );
     }
-    return Padding(
-      padding: const EdgeInsets.all(12),
-      child: GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: p.colunas,
-          mainAxisSpacing: 6,
-          crossAxisSpacing: 6,
-          // Altura FIXA por célula, não `childAspectRatio` — mesmo motivo
-          // documentado em `tela_configuracao_pelotao.dart`: com aspect
-          // ratio, um grid de poucas colunas numa tela larga vira células
-          // gigantes (o alvo de toque não precisa de mais que ~76px, e
-          // células grandes também empurram linhas de baixo para fora do
-          // viewport visível de um `GridView` preguiçoso).
-          mainAxisExtent: 76,
+    final EstadoFormacao? entrada = controlador.estadoEntradaSelecionada;
+    if (entrada == null) {
+      return const CentroCarregando();
+    }
+    final List<Diagnostico> diagnosticos = controlador.diagnosticosEntradaSelecionada;
+    return Column(
+      children: <Widget>[
+        // Diagnósticos NUNCA ficam escondidos: se a simulação até a parte
+        // anterior já encontrou comando impossível ou colisão, é
+        // informação de que a parte que o instrutor está montando agora
+        // parte de um estado quebrado — mostrar, nunca abortar (mesma
+        // disciplina das quatro checagens do motor).
+        if (diagnosticos.isNotEmpty) _AvisoDiagnosticosEntrada(diagnosticos: diagnosticos),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: _FormacaoEditorInterativa(controlador: controlador, entrada: entrada, pelotao: p),
+          ),
         ),
-        itemCount: p.totalSlots,
-        itemBuilder: (BuildContext context, int slot) => _CelulaSlot(
-          slot: slot,
-          controlador: controlador,
+      ],
+    );
+  }
+}
+
+class _AvisoDiagnosticosEntrada extends StatelessWidget {
+  const _AvisoDiagnosticosEntrada({required this.diagnosticos});
+  final List<Diagnostico> diagnosticos;
+
+  @override
+  Widget build(BuildContext context) {
+    final int erros = diagnosticos
+        .where((Diagnostico d) => d.severidade == SeveridadeDiagnostico.erro)
+        .length;
+    final int avisos = diagnosticos.length - erros;
+    return Material(
+      color: Paleta.erroSuperficie,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Row(
+          children: <Widget>[
+            const Icon(Icons.warning_amber_rounded, color: Paleta.acento),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'A simulação até esta parte encontrou $erros erro(s)'
+                '${avisos > 0 ? ' e $avisos aviso(s)' : ''} — o estado de '
+                'entrada mostrado abaixo pode não refletir o que vai '
+                'acontecer de verdade no ensaio.',
+                style: const TextStyle(color: Paleta.claro, fontSize: 12),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _CelulaSlot extends StatelessWidget {
-  const _CelulaSlot({required this.slot, required this.controlador});
-  final int slot;
+/// Desenha [entrada] com [FormacaoPainter] em modo editor (reaproveitado
+/// do playback — ver dartdoc de [FormacaoPainter.modoEditor], nunca um
+/// segundo `CustomPainter`) e faz o hit-testing por PROXIMIDADE: com gente
+/// fora dos cruzamentos do grid original, "que slot está aqui" deixa de
+/// ser divisão inteira — toque seleciona a pessoa mais perto, dentro de um
+/// raio, nunca por índice de célula.
+class _FormacaoEditorInterativa extends StatelessWidget {
+  const _FormacaoEditorInterativa({
+    required this.controlador,
+    required this.entrada,
+    required this.pelotao,
+  });
+
   final ControladorEditorPartes controlador;
+  final EstadoFormacao entrada;
+  final PelotaoDoc pelotao;
+
+  List<EstadoRenderizado> _estados() => <EstadoRenderizado>[
+    for (final int slot in entrada.slots)
+      _paraEstadoRenderizado(slot, entrada[slot]),
+  ];
+
+  EstadoRenderizado _paraEstadoRenderizado(int slot, EstadoPessoa pessoa) {
+    final (double linha, double coluna) = pessoa.posicao.emCelulas();
+    return EstadoRenderizado(
+      slot: slot,
+      linha: linha,
+      coluna: coluna,
+      anguloGraus: pessoa.dir * 45.0,
+      cadencia: pessoa.cad,
+      batidas: const <TipoBatida>{},
+    );
+  }
+
+  Rect _enquadramento(List<EstadoRenderizado> estados) {
+    if (estados.isEmpty) return Rect.zero;
+    double minLinha = estados.first.linha;
+    double maxLinha = minLinha;
+    double minColuna = estados.first.coluna;
+    double maxColuna = minColuna;
+    for (final EstadoRenderizado e in estados) {
+      if (e.linha < minLinha) minLinha = e.linha;
+      if (e.linha > maxLinha) maxLinha = e.linha;
+      if (e.coluna < minColuna) minColuna = e.coluna;
+      if (e.coluna > maxColuna) maxColuna = e.coluna;
+    }
+    return Rect.fromLTRB(minColuna, minLinha, maxColuna, maxLinha);
+  }
+
+  /// Ajusta [disponivel] ao [aspecto] alvo preservando proporção (o mesmo
+  /// que `AspectRatio` faria) — feito à mão, em vez de usar o widget,
+  /// porque o hit-testing e o posicionamento dos rótulos precisam do
+  /// `Size` exato da caixa de desenho, e `AspectRatio` não expõe isso sem
+  /// uma segunda consulta ao `RenderBox` depois do layout.
+  Size _ajustarAspecto(Size disponivel, double aspecto) {
+    if (aspecto <= 0 || disponivel.width <= 0 || disponivel.height <= 0) {
+      return disponivel;
+    }
+    double largura = disponivel.width;
+    double altura = largura / aspecto;
+    if (altura > disponivel.height) {
+      altura = disponivel.height;
+      largura = altura * aspecto;
+    }
+    return Size(largura, altura);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final PelotaoDoc p = controlador.pelotao!;
-    final bool selecionado = controlador.selecionados.contains(slot);
-    final Cadencia cadencia = controlador.cadenciaAtualDoSlot(slot);
-    final bool recebeu = controlador.recebeuAtribuicaoNestaParte(slot);
-    final Map<String, dynamic> atribs = controlador.atribuicoesEfetivas();
-    final dynamic bruto = atribs['$slot'];
-    final bool temPercussao =
-        bruto != null && (bruto as Map<String, dynamic>)['percussao'] != null;
-    final String rotulo = p.rotulos['$slot'] ?? 'Slot $slot';
+    final List<EstadoRenderizado> estados = _estados();
+    final Rect enquadramento = _enquadramento(estados);
+    final Map<String, dynamic> atribuicoes = controlador.atribuicoesEfetivas();
+    final Set<int> continuacao = <int>{
+      for (final EstadoRenderizado e in estados)
+        if (controlador.recebeuAtribuicaoNestaParte(e.slot)) e.slot,
+    };
+    final Set<int> comPercussao = <int>{
+      for (final EstadoRenderizado e in estados)
+        if (atribuicoes['${e.slot}'] case final Map<String, dynamic> a
+            when a['percussao'] != null)
+          e.slot,
+    };
 
-    return InkWell(
-      onTap: controlador.podeEditar ? () => controlador.alternarSlot(slot) : null,
-      child: Container(
-        decoration: BoxDecoration(
-          color: selecionado ? Paleta.acento.withValues(alpha: 0.18) : Paleta.superficie,
-          border: Border.all(
-            color: selecionado ? Paleta.acento : Paleta.cinzaEscuro,
-            width: selecionado ? 2 : 1,
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final Size disponivel = Size(
+          constraints.maxWidth.isFinite ? constraints.maxWidth : 0,
+          constraints.maxHeight.isFinite ? constraints.maxHeight : 0,
+        );
+        final Rect caixaComMargem = enquadramento.inflate(FormacaoPainter.margemCelulas);
+        final double aspecto = (caixaComMargem.width <= 0 || caixaComMargem.height <= 0)
+            ? 1
+            : caixaComMargem.width / caixaComMargem.height;
+        final Size caixa = _ajustarAspecto(disponivel, aspecto);
+        final TransformacaoEnquadramento transformacao = TransformacaoEnquadramento.calcular(
+          enquadramento: enquadramento,
+          tela: caixa,
+          margemCelulas: FormacaoPainter.margemCelulas,
+          escalaMinimaPx: FormacaoPainter.escalaMinimaPx,
+          escalaMaximaPx: FormacaoPainter.escalaMaximaPx,
+        );
+        return Center(
+          child: SizedBox(
+            width: caixa.width,
+            height: caixa.height,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTapUp: controlador.podeEditar
+                  ? (TapUpDetails d) =>
+                        _selecionarPorProximidade(d.localPosition, caixa, transformacao, estados)
+                  : null,
+              child: Stack(
+                children: <Widget>[
+                  CustomPaint(
+                    size: caixa,
+                    painter: FormacaoPainter(
+                      estados: estados,
+                      campo: const Campo(),
+                      enquadramento: enquadramento,
+                      mostrarPontos: true,
+                      modoEditor: true,
+                      slotsSelecionados: controlador.selecionados,
+                      slotsComContinuacao: continuacao,
+                      slotsComPercussaoEditor: comPercussao,
+                    ),
+                  ),
+                  for (final EstadoRenderizado e in estados)
+                    _rotulo(caixa, transformacao, e),
+                ],
+              ),
+            ),
           ),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Expanded(
-              child: CustomPaint(
-                painter: SlotEditorPainter(
-                  cadencia: cadencia,
-                  setor: 0,
-                  recebeuInstrucao: recebeu,
-                  temPercussao: temPercussao,
-                ),
-                child: const SizedBox.expand(),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Text(
-                rotulo,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: Paleta.cinzaMedio, fontSize: 10),
-              ),
-            ),
-          ],
+        );
+      },
+    );
+  }
+
+  /// Toque -> pessoa mais perto, dentro de um raio (nunca por índice de
+  /// célula — ver dartdoc de classe). Fora do raio, o toque é descartado
+  /// (nenhuma seleção troca "por acidente" para alguém longe do dedo).
+  void _selecionarPorProximidade(
+    Offset local,
+    Size caixa,
+    TransformacaoEnquadramento transformacao,
+    List<EstadoRenderizado> estados,
+  ) {
+    if (estados.isEmpty) return;
+    // Meia célula de raio, com piso absoluto de 24px — mesmo espírito do
+    // alvo de toque mínimo (~76px de lado) que o grid fixo antigo usava:
+    // suficiente pra acertar com o dedo, sem roubar o toque de um vizinho
+    // real a mais de meia célula de distância.
+    final double raioPx = math.max(transformacao.tamanhoCelulaPx * 0.6, 24);
+    EstadoRenderizado? maisPerto;
+    double menorDistancia = double.infinity;
+    for (final EstadoRenderizado e in estados) {
+      final Offset tela = FormacaoPainter.converterParaTela(caixa, transformacao, e.linha, e.coluna);
+      final double distancia = (tela - local).distance;
+      if (distancia < menorDistancia) {
+        menorDistancia = distancia;
+        maisPerto = e;
+      }
+    }
+    if (maisPerto != null && menorDistancia <= raioPx) {
+      controlador.alternarSlot(maisPerto.slot);
+    }
+  }
+
+  static const double _larguraRotulo = 64;
+
+  Widget _rotulo(Size caixa, TransformacaoEnquadramento transformacao, EstadoRenderizado e) {
+    final Offset centro = FormacaoPainter.converterParaTela(caixa, transformacao, e.linha, e.coluna);
+    final String rotulo = pelotao.rotulos['${e.slot}'] ?? 'Slot ${e.slot}';
+    return Positioned(
+      left: centro.dx - _larguraRotulo / 2,
+      top: centro.dy + transformacao.tamanhoCelulaPx * 0.5,
+      width: _larguraRotulo,
+      child: IgnorePointer(
+        child: Text(
+          rotulo,
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(color: Paleta.cinzaMedio, fontSize: 10),
         ),
       ),
     );
