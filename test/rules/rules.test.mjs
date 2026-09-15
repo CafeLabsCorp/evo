@@ -34,6 +34,8 @@ import {
   getDoc,
   getDocs,
   query,
+  runTransaction,
+  serverTimestamp,
   setDoc,
   updateDoc,
   where,
@@ -869,6 +871,146 @@ describe('runbook de exclusão (docs/DADOS.md 4.1)', () => {
         getDocs(query(collection(d, c), where('clubId', '==', CLUBE_ID))),
       );
     }
+  });
+});
+
+// -- caminho de escrita REAL do cliente ---------------------------------------
+// Todo o resto desta suíte monta o documento à mão e chama setDoc/updateDoc.
+// Isso cobre a regra de ESCRITA, mas não cobre a SEQUÊNCIA que o app executa —
+// e foi exatamente aí que a regra estava errada: `RepositorioEvoFirestore`
+// (gravarPelotao/gravarEvolucao) faz `tx.get(ref)` DENTRO de uma transação
+// para decidir create vs update sem reenviar `criadoEm`. No create, esse `get`
+// cai em documento INEXISTENTE.
+//
+// Com `allow read: if membroAtivo(resource.data.clubId)`, `resource` era null
+// nesse caso, a expressão dava "Null value error", o avaliador negava, e a
+// transação abortava ANTES de a regra de create rodar. Criar pelotão era
+// impossível — com qualquer grid e qualquer rótulo — e o cliente recebia um
+// `permission-denied` que nada tinha a ver com o conteúdo do documento.
+//
+// Os testes abaixo replicam a sequência do cliente, não um documento pronto.
+// Se alguém reintroduzir `allow read` sem o ramo de `resource == null`
+// (`podeObterDocumentoDeClube()`), eles ficam vermelhos.
+
+describe('caminho de escrita real do cliente (transação get + set)', () => {
+  // Réplica fiel de RepositorioEvoFirestore.gravarPelotao/gravarEvolucao.
+  async function gravarComoOCliente(d, path, id, campos) {
+    const ref = doc(d, path, id);
+    return runTransaction(d, async (tx) => {
+      const atual = await tx.get(ref);
+      if (!atual.exists()) {
+        tx.set(ref, {
+          ...campos,
+          criadoEm: serverTimestamp(),
+          atualizadoEm: serverTimestamp(),
+        });
+      } else {
+        tx.update(ref, { ...campos, atualizadoEm: serverTimestamp() });
+      }
+    });
+  }
+
+  function pelotaoSemTimestamps(extra = {}) {
+    const { criadoEm, atualizadoEm, ...resto } = pelotaoDoc(extra);
+    return resto;
+  }
+  function evolucaoSemTimestamps(extra = {}) {
+    const { criadoEm, atualizadoEm, ...resto } = evolucaoDoc(extra);
+    return resto;
+  }
+
+  test('membro ativo lê por id um pelotão que NÃO existe (não vaza nada, e é o que a transação faz)', async () => {
+    await semear();
+    await assertSucceeds(getDoc(pelotaoRef(db(DONO), 'ainda-nao-existe')));
+  });
+
+  test('não autenticado NÃO lê por id um documento inexistente', async () => {
+    // O ramo de `resource == null` concede a quem está autenticado, não a
+    // qualquer um: a informação "este id não existe" não é pública.
+    await semear();
+    for (const c of ['pelotoes', 'evolucoes', 'partes']) {
+      await assertFails(getDoc(doc(anon(), c, 'ainda-nao-existe')));
+    }
+  });
+
+  test('cria pelotão pelo caminho do cliente em 1×1, 3×3, 5×5 e 6×6', async () => {
+    await semear();
+    const d = db(DONO);
+    for (const [linhas, colunas] of [[1, 1], [3, 3], [5, 5], [6, 6]]) {
+      await assertSucceeds(
+        gravarComoOCliente(d, 'pelotoes', `p-${linhas}x${colunas}`,
+          pelotaoSemTimestamps({ linhas, colunas })),
+      );
+    }
+  });
+
+  test('cria pelotão 6×6 com os 36 rótulos no teto de 24 caracteres', async () => {
+    await semear();
+    await assertSucceeds(
+      gravarComoOCliente(db(DONO), 'pelotoes', 'p-cheio',
+        pelotaoSemTimestamps({ linhas: 6, colunas: 6, rotulos: rotulos36Cheios() })),
+    );
+  });
+
+  test('cria pelotão com grid parcialmente vazio (nem todo slot tem rótulo)', async () => {
+    await semear();
+    await assertSucceeds(
+      gravarComoOCliente(db(DONO), 'pelotoes', 'p-parcial',
+        pelotaoSemTimestamps({ linhas: 6, colunas: 6, rotulos: { 0: 'Alfa', 35: 'Zulu' } })),
+    );
+  });
+
+  test('o MESMO caminho atualiza o pelotão depois, sem tocar em criadoEm', async () => {
+    await semear();
+    const d = db(DONO);
+    await assertSucceeds(
+      gravarComoOCliente(d, 'pelotoes', 'p-ciclo', pelotaoSemTimestamps()),
+    );
+    await assertSucceeds(
+      gravarComoOCliente(d, 'pelotoes', 'p-ciclo',
+        pelotaoSemTimestamps({ nome: 'Renomeado', linhas: 4, colunas: 4 })),
+    );
+  });
+
+  test('cria e atualiza evolução pelo mesmo caminho (mesma transação)', async () => {
+    await semear();
+    const d = db(DONO);
+    await assertSucceeds(
+      gravarComoOCliente(d, 'evolucoes', 'e-ciclo', evolucaoSemTimestamps()),
+    );
+    await assertSucceeds(
+      gravarComoOCliente(d, 'evolucoes', 'e-ciclo',
+        evolucaoSemTimestamps({ nome: 'Renomeada' })),
+    );
+  });
+
+  test('o ramo de documento inexistente NÃO libera escrita inválida', async () => {
+    // O que se concedeu foi o `get`, nada além dele: a regra de create continua
+    // valendo sobre o documento que a transação tenta gravar.
+    await semear();
+    const d = db(DONO);
+    await assertFails(
+      gravarComoOCliente(d, 'pelotoes', 'p-invalido',
+        pelotaoSemTimestamps({ linhas: 8 })),
+    );
+    await assertFails(
+      gravarComoOCliente(d, 'pelotoes', 'p-invalido2',
+        pelotaoSemTimestamps({ rotulos: { 0: texto(25) } })),
+    );
+    await assertFails(
+      gravarComoOCliente(d, 'pelotoes', 'p-invalido3',
+        pelotaoSemTimestamps({ idade: 14 })),
+    );
+  });
+
+  test('estranho não cria pelotão pelo caminho do cliente nem lendo id inexistente antes', async () => {
+    // O `get` do id inexistente passa (ele está autenticado), e a escrita
+    // continua barrada — que é o ponto: a concessão é só de leitura de nada.
+    await semear();
+    await assertFails(
+      gravarComoOCliente(db(ESTRANHO), 'pelotoes', 'p-do-estranho',
+        pelotaoSemTimestamps()),
+    );
   });
 });
 

@@ -43,8 +43,13 @@ cd test/rules && npm install && npm test
 
 ## O que a suíte cobre
 
-88 testes. Além do caminho feliz (sem ele, uma regra que negasse tudo passaria
+99 testes. Além do caminho feliz (sem ele, uma regra que negasse tudo passaria
 em todos os testes negativos):
+
+- **o caminho de escrita REAL do cliente** — a transação `get` + `set` que
+  `RepositorioEvoFirestore.gravarPelotao`/`gravarEvolucao` executa, replicada
+  passo a passo, em vez de um documento montado pronto. Ver o bloco "caminho de
+  escrita real do cliente" e o porquê logo abaixo;
 
 - não autenticado bloqueado em leitura, consulta, criação, update e delete das
   quatro coleções;
@@ -76,6 +81,24 @@ em todos os testes negativos):
   filhos permanentemente inalcançáveis — o incidente que o Domo já teve, aqui
   congelado como teste em vez de como recomendação;
 - as quatro consultas de que o export client-side depende.
+
+### Por que existe um bloco que replica a sequência do cliente
+
+Todo o resto da suíte chama `setDoc`/`updateDoc` com um documento montado à mão.
+Isso exercita a regra de **escrita**, e é a razão de 90 testes verdes terem
+convivido com um bug que impedia criar qualquer pelotão: a regra que estava
+errada era a de **leitura**, e nenhum teste lia um documento **inexistente**.
+
+O app decide create vs update fazendo `tx.get(ref)` dentro de uma transação
+(para nunca reenviar `criadoEm`, que é imutável). No create esse `get` cai num
+documento que ainda não existe, onde `resource` é null do lado da regra — e
+`allow read: if membroAtivo(resource.data.clubId)` dava erro de avaliação ali,
+negando. A transação abortava antes de a regra de create rodar, com qualquer
+grid e qualquer rótulo.
+
+Moral para quem for acrescentar teste aqui: **um documento montado pelo teste
+não é o que o app envia, e a sequência importa tanto quanto o conteúdo.** Quando
+o caminho do cliente mudar, este bloco muda junto.
 
 As fixtures são **100% fictícias** ("Clube Exemplo", "Alfa", "Bravo",
 "Charlie"). O repositório é público: nenhum apelido real, nome de clube real,

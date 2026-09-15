@@ -15,6 +15,36 @@ rules_version = '2';
 //   camposPermitidosEvolucao() camposPermitidosParte()
 //   rotulosValidos()
 //
+// -----------------------------------------------------------------------------
+// ESPELHO NO CLIENTE — app/lib/dados/validacao_espelho.dart
+// -----------------------------------------------------------------------------
+// O Firestore devolve `permission-denied` IDÊNTICO para "não autorizado" e para
+// "não passou na validação". Para o app conseguir dizer qual dos dois foi, ele
+// repete estas verificações ANTES de escrever, em
+// `app/lib/dados/validacao_espelho.dart` — função pura, sem rede. O mapeamento
+// é nominal e 1:1, na mesma ordem de asserções:
+//
+//   pelotaoValido()  / rotulosValidos()      <-> validarPelotao
+//   evolucaoValida() / estadoInicialValido() <-> validarEvolucao
+//                    / campoValido()
+//   parteValida()    / atribuicoesValidas()  <-> validarParte
+//
+// MEXEU AQUI, MEXE LÁ, NO MESMO COMMIT. Um espelho que diverge é pior que
+// espelho nenhum: o app passa a afirmar que o dado está bom enquanto o servidor
+// recusa, e a mensagem de erro volta a mentir — agora com ar de autoridade.
+//
+// O que NÃO é espelhado, de propósito: `membroAtivo()` (depende de get() no
+// clube), os timestamps de servidor, os `camposPermitidos*()` (o conjunto de
+// chaves é fechado pelo tipo no cliente) e o interior de `estadoInicial.slots`/
+// `atribuicoes` (que este arquivo também não valida — ver LIMITAÇÃO CONHECIDA
+// abaixo). `membroAtivo()` ficar só aqui é o que dá sentido à mensagem do app:
+// se o espelho passou e o servidor negou, o que sobrou foi autorização.
+//
+// `size()` daqui conta UNIDADES UTF-16, não bytes nem pontos de código —
+// medido no emulador contra esta regra, tabela em validacao_espelho.dart. É o
+// que `String.length` do Dart conta, o que torna o espelho exato.
+// -----------------------------------------------------------------------------
+//
 // MODELO DE DADOS (tudo top-level, nenhuma subcoleção, nenhum `usuarios/{uid}`):
 //
 //   clubes/{clubId}       documento de AUTORIZAÇÃO — é ele que os filhos
@@ -111,6 +141,38 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/clubes/$(clubId))
         && uid() in clube(clubId).membrosAtivos
         && clube(clubId).membrosAtivos[uid()] == true;
+    }
+
+    // -------------------------------------------------------------------------
+    // GET DE DOCUMENTO INEXISTENTE — por que este ramo existe
+    // -------------------------------------------------------------------------
+    // Num `get` de documento que NÃO EXISTE, `resource` é null. Escrever
+    // `membroAtivo(resource.data.clubId)` sem este ramo produz "Null value
+    // error" no avaliador, erro de avaliação NEGA, e o cliente recebe
+    // `permission-denied` — indistinguível de "você não é membro".
+    //
+    // Isso não é teoria: o caminho REAL de criação de pelotão/evolução
+    // (`RepositorioEvoFirestore.gravarPelotao`/`gravarEvolucao`) faz
+    // `tx.get(ref)` DENTRO da transação para decidir create vs update sem
+    // reenviar `criadoEm`. No create o documento ainda não existe, então esse
+    // `get` era negado e a transação inteira abortava ANTES de a escrita ser
+    // avaliada. Resultado: era impossível criar um pelotão, com qualquer grid
+    // e qualquer rótulo — a regra de escrita nunca chegava a rodar.
+    //
+    // Liberar este caso não abre dado nenhum: um documento inexistente não tem
+    // conteúdo a vazar. O que se concede é a informação "este id não existe",
+    // e só para quem já está autenticado — ids são auto-ids de 20 caracteres,
+    // não enumeráveis. `list` continua exigindo `membroAtivo` por documento,
+    // então ninguém varre a coleção por aqui.
+    //
+    // Cuidado ao mexer: `allow read` cobre `get` E `list`. Os dois são
+    // declarados separadamente de propósito — um `resource == null` dentro de
+    // `list` não faz sentido e afrouxaria a consulta.
+    // -------------------------------------------------------------------------
+    function podeObterDocumentoDeClube() {
+      return resource == null
+        ? autenticado()
+        : membroAtivo(resource.data.clubId);
     }
 
     // ---- clubes -----------------------------------------------------------
@@ -330,7 +392,10 @@ service cloud.firestore {
           && rotulosValidos();
       }
 
-      allow read: if membroAtivo(resource.data.clubId);
+      // Ver podeObterDocumentoDeClube(): `get` e `list` separados porque só o
+      // `get` pode cair em documento inexistente.
+      allow get: if podeObterDocumentoDeClube();
+      allow list: if membroAtivo(resource.data.clubId);
 
       allow create: if membroAtivo(next().clubId)
         && camposPermitidosPelotao()
@@ -403,7 +468,11 @@ service cloud.firestore {
           && campoValido();
       }
 
-      allow read: if membroAtivo(resource.data.clubId);
+      // Ver podeObterDocumentoDeClube(): `gravarEvolucao` usa a MESMA transação
+      // com `tx.get` de `gravarPelotao`, então a criação de evolução dependia
+      // deste mesmo ramo para existir.
+      allow get: if podeObterDocumentoDeClube();
+      allow list: if membroAtivo(resource.data.clubId);
 
       allow create: if membroAtivo(next().clubId)
         && camposPermitidosEvolucao()
@@ -472,7 +541,12 @@ service cloud.firestore {
           && atribuicoesValidas();
       }
 
-      allow read: if membroAtivo(resource.data.clubId);
+      // `gravarParte` não lê antes de escrever (`partes` não tem `criadoEm`
+      // imutável, então um `.set()` de corpo inteiro basta) — mas o ramo fica
+      // aqui por simetria: a assimetria seria uma armadilha para a primeira
+      // pessoa que precisasse ler uma parte por id antes de criá-la.
+      allow get: if podeObterDocumentoDeClube();
+      allow list: if membroAtivo(resource.data.clubId);
 
       allow create: if membroAtivo(next().clubId)
         && camposPermitidosParte()
