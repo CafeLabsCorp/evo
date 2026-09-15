@@ -43,7 +43,16 @@ Future<PacoteEvolucao> carregarEvolucaoDoAsset(
     throw FormatException('JSON malformado em "$caminhoAsset": ${e.message}');
   }
 
-  final Evolucao evolucao = evolucaoDoJson(json);
+  return simularEvolucao(evolucaoDoJson(json), cfg);
+}
+
+/// Roda a simulação sobre uma [Evolucao] já montada (de onde quer que ela
+/// tenha vindo — asset local ou, via `telas/tela_playback_nuvem.dart`,
+/// `RepositorioEvo`/Firestore) e empacota o resultado. Extraído de
+/// [carregarEvolucaoDoAsset] para que as duas fontes de dado compartilhem
+/// exatamente a mesma chamada a `simular`, em vez de cada uma reimplementar
+/// o empacotamento em [PacoteEvolucao].
+PacoteEvolucao simularEvolucao(Evolucao evolucao, [Config cfg = const Config()]) {
   final ResultadoSimulacao resultado = simular(
     evolucao.estadoInicial,
     evolucao.partes,

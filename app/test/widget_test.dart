@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:evo_app/main.dart';
 import 'package:evo_app/modelo/carregador_evolucao.dart';
 import 'package:evo_app/pintura/formacao_painter.dart';
 import 'package:evo_app/telas/tela_playback.dart';
@@ -25,8 +24,9 @@ Future<void> _esperarCarregar(WidgetTester tester) async {
 /// Lê e simula o JSON de exemplo direto do disco, sem passar pelo
 /// `rootBundle` — usado só pelos testes de INTERAÇÃO (play/pause, faixa,
 /// scrub), que não precisam repetir o caminho de I/O de asset a cada
-/// teste (esse já tem cobertura dedicada em
-/// "carrega o asset de exemplo do rootBundle...", abaixo).
+/// teste (esse caminho de carregamento real via `rootBundle` é exercitado
+/// pelo teste de erro logo abaixo, que também passa por
+/// `carregarEvolucaoDoAsset`).
 Future<PacoteEvolucao> _carregarPacoteDeTeste() async {
   final String texto = await File(
     'assets/evolucoes/exemplo.json',
@@ -41,23 +41,17 @@ Future<PacoteEvolucao> _carregarPacoteDeTeste() async {
 }
 
 void main() {
-  testWidgets(
-    'carrega o asset de exemplo do rootBundle e mostra o playback pronto',
-    (WidgetTester tester) async {
-      await tester.pumpWidget(const EvoApp());
-
-      // Estado de carregamento primeiro — cobre o caminho real de I/O (o
-      // único do app inteiro), sem mock.
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
-
-      await _esperarCarregar(tester);
-
-      expect(find.byType(CircularProgressIndicator), findsNothing);
-      expect(find.byIcon(Icons.play_circle_filled), findsOneWidget);
-      expect(find.text('Evolução completa'), findsOneWidget);
-    },
-  );
-
+  // A antiga suíte tinha um teste aqui que fazia `pumpWidget(const
+  // EvoApp())` esperando ver o playback do asset de exemplo direto — isso
+  // valia quando `EvoApp.home` era a `TelaPlayback` de demonstração. Desde
+  // a integração com Firestore (`main.dart`), `EvoApp.home` é `PortaoApp`
+  // (gate de autenticação + bootstrap de clube), então esse caminho agora
+  // tem cobertura própria em `test/portao_app_test.dart`, com
+  // `MockFirebaseAuth`/`FakeFirebaseFirestore` injetados — não dá para
+  // testar `EvoApp` de verdade sem isso, já que ele chama
+  // `ServicoAutenticacao()`/`FirebaseAuth.instance` por padrão. Este
+  // arquivo continua cobrindo `TelaPlayback` isoladamente (que é o que os
+  // testes abaixo já faziam, direto, sem depender de `EvoApp`).
   testWidgets(
     'JSON inexistente mostra a tela de erro, não uma tela em branco',
     (WidgetTester tester) async {

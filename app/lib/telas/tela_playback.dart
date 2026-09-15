@@ -72,7 +72,7 @@ class _TelaPlaybackState extends State<TelaPlayback>
               }
               final PacoteEvolucao pacote = snapshot.data!;
               _controlador ??= ControladorPlayback(pacote: pacote, vsync: this);
-              return _CorpoPlayback(controlador: _controlador!);
+              return CorpoPlayback(controlador: _controlador!);
             },
       ),
     );
@@ -110,8 +110,12 @@ class _ErroCarregamento extends StatelessWidget {
   }
 }
 
-class _CorpoPlayback extends StatelessWidget {
-  const _CorpoPlayback({required this.controlador});
+/// Corpo do player (formação + controles) — PÚBLICO de propósito: é
+/// reaproveitado por `telas/tela_playback_nuvem.dart` (a versão que lê de
+/// `RepositorioEvo`/Firestore em vez de asset local), para as duas telas
+/// nunca divergirem em como o playback em si se comporta.
+class CorpoPlayback extends StatelessWidget {
+  const CorpoPlayback({super.key, required this.controlador});
   final ControladorPlayback controlador;
 
   @override
