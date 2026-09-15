@@ -108,7 +108,7 @@ decidir se alguém pode ler ou escrever — por isso é o **último** a ser apag
 |---|---|---|---|---|---|---|
 | `nome` | O clube (entidade) | não, isoladamente | Identificar o clube na interface | — | Enquanto o clube existir | Exclusão do clube |
 | `dono` (uid) | Instrutor | sim (pseudônimo) | Definir quem pode apagar o clube | Execução de contrato | Idem | Idem |
-| `membros{uid: {estado, papel, nomeExibicao}}` | Instrutor | **sim (direto)** — `nomeExibicao` vem do perfil Google | Exibir e aprovar quem participa da diretoria | **a definir em 28/09** | Idem | Idem |
+| `membros{uid: {estado, papel}}` | Instrutor | sim (pseudônimo) — `nomeExibicao` **não** é persistido; a regra rejeita a chave | Saber quem participa do clube e com que papel | Execução de contrato | Idem | Idem |
 | `membrosAtivos{uid: true}` | Instrutor | sim (pseudônimo) | Índice consultado pelas Security Rules (evita ler o mapa aninhado) | Execução de contrato | Idem | Idem |
 | `criadoEm` | — | não | Auditoria | — | Idem | Idem |
 
@@ -122,9 +122,10 @@ de convite — que **não existe nesta versão**. Enquanto for single-user, ele 
 nome civil de um adulto guardado para uma funcionalidade ainda inexistente.
 Manter a chave do mapa é o que importa para a migração; o valor
 `nomeExibicao` pode ficar de fora até o convite existir, sem custo nenhum de
-migração depois (é valor de mapa, não campo de documento). Decisão do `backend`
-de mantê-lo é legítima e está registrada; a alternativa minimizadora fica aqui
-anotada para quem revisar.
+migração depois (é valor de mapa, não campo de documento). Foi essa a decisão
+tomada: `membrosValidos()` em `firestore.rules` faz `hasOnly(['estado',
+'papel'])`, então o servidor **rejeita** `nomeExibicao` hoje. Acrescentá-lo
+quando a tela de convite existir é uma linha na regra.
 
 ### 2.3 `pelotoes/{id}` — a coleção sensível
 

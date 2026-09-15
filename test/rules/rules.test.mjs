@@ -782,6 +782,38 @@ describe('imutabilidade', () => {
     await assertFails(updateDoc(parteRef(db(DONO)), { evolucaoId: 'outra' }));
   });
 
+  test('pelotaoId é imutável em evolucoes', async () => {
+    // Trocar o pelotão reinterpreta em silêncio os índices de slot já salvos
+    // em `estadoInicial.slots` (e nas partes filhas): o slot 12 passaria a ser
+    // outra pessoa, em outra coordenada. O servidor recusa.
+    await semear();
+    await assertFails(
+      updateDoc(evolucaoRef(db(DONO)), {
+        pelotaoId: 'outro-pelotao',
+        atualizadoEm: agora(),
+      }),
+    );
+  });
+
+  test('update de evolução que não toca em pelotaoId continua passando', async () => {
+    // Contraprova do teste acima: sem ela, uma regra que negasse todo update de
+    // evolução passaria igual.
+    await semear();
+    const d = db(DONO);
+    await assertSucceeds(
+      updateDoc(evolucaoRef(d), { nome: 'Evolução B', atualizadoEm: agora() }),
+    );
+    // Reescrever o MESMO pelotaoId também passa — a regra compara valor, não
+    // presença da chave no update (é assim que um `set` com merge do app, que
+    // reenvia o documento inteiro, não é quebrado pela trava).
+    await assertSucceeds(
+      updateDoc(evolucaoRef(d), {
+        pelotaoId: PELOTAO_ID,
+        atualizadoEm: agora(),
+      }),
+    );
+  });
+
   test('dono e criadoEm são imutáveis no clube', async () => {
     await semear();
     const d = db(DONO);

@@ -409,8 +409,23 @@ service cloud.firestore {
         && camposPermitidosEvolucao()
         && evolucaoValida();
 
+      // `pelotaoId` é imutável junto com `clubId`. Não é rigor decorativo: as
+      // chaves de `estadoInicial.slots` (e as de `atribuicoes` das partes
+      // filhas) são ÍNDICES DE SLOT, e o que dá significado a um índice é o
+      // grid do pelotão — `linhas`, `colunas` e o rótulo de cada posição.
+      // Trocar o pelotão de uma evolução já montada reinterpreta em silêncio
+      // todo o posicionamento salvo: o slot 12 passa a ser outra pessoa, em
+      // outra coordenada, possivelmente fora do grid novo. Nada no documento
+      // ficaria inválido, e por isso nada seria rejeitado depois — o dado só
+      // passaria a significar outra coisa.
+      //
+      // VÁLVULA DE ESCAPE (hoje): apagar a evolução e recriar no pelotão
+      // certo — o que custa as partes junto, porque elas são filhas dela. É a
+      // única saída para quem criou a evolução no pelotão errado, e está
+      // registrada aqui como limitação conhecida, não como descuido.
       allow update: if membroAtivo(prev().clubId)
         && inalterado('clubId')
+        && inalterado('pelotaoId')
         && inalterado('criadoEm')
         && camposPermitidosEvolucao()
         && evolucaoValida();
