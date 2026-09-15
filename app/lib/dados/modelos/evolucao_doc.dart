@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'campo_doc.dart';
+import 'timestamp_pendente.dart';
 
 /// Documento de `evolucoes/{id}` como a TELA enxerga — sem `clubId` (regra
 /// de disciplina #6 do repositório: tenancy nunca aparece no modelo que a
@@ -63,8 +64,8 @@ class EvolucaoDoc {
           ? null
           : CampoDoc.doMapa(dados['campo'] as Map<String, dynamic>),
       versaoCatalogo: dados['versaoCatalogo'] as int,
-      criadoEm: (dados['criadoEm'] as Timestamp).toDate(),
-      atualizadoEm: (dados['atualizadoEm'] as Timestamp).toDate(),
+      criadoEm: dataDeTimestampPendente(dados['criadoEm']),
+      atualizadoEm: dataDeTimestampPendente(dados['atualizadoEm']),
       pendente: doc.metadata.hasPendingWrites,
     );
   }

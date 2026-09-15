@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'timestamp_pendente.dart';
+
 /// Documento de `partes/{id}` como a TELA enxerga — sem `clubId` (regra de
 /// disciplina #6: tenancy nunca aparece no modelo). `evolucaoId` fica,
 /// porque é relação de domínio (a qual evolução esta parte pertence), não
@@ -43,7 +45,7 @@ class ParteDoc {
       atribuicoes: Map<String, dynamic>.from(
         dados['atribuicoes'] as Map<String, dynamic>,
       ),
-      atualizadoEm: (dados['atualizadoEm'] as Timestamp).toDate(),
+      atualizadoEm: dataDeTimestampPendente(dados['atualizadoEm']),
       pendente: doc.metadata.hasPendingWrites,
     );
   }

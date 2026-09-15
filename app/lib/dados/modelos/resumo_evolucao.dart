@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'timestamp_pendente.dart';
+
 /// Projeção leve de `evolucoes/{id}` para a LISTA (tela de navegação) —
 /// deliberadamente mais magra que [EvolucaoDoc]: a lista não precisa de
 /// `estadoInicial` (que pode ter até 36 slots) para desenhar uma linha com
@@ -26,7 +28,7 @@ class ResumoEvolucao {
       id: doc.id,
       nome: dados['nome'] as String,
       pelotaoId: dados['pelotaoId'] as String,
-      atualizadoEm: (dados['atualizadoEm'] as Timestamp).toDate(),
+      atualizadoEm: dataDeTimestampPendente(dados['atualizadoEm']),
     );
   }
 }

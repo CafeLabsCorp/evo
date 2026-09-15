@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'timestamp_pendente.dart';
+
 /// Teto de caracteres por rótulo — espelha `rotulosDoMapaValidos()` em
 /// `firestore.rules`. Limita TAMANHO, não semântica (docs/DADOS.md 3.3a):
 /// não impede um nome civil curto, só um texto livre longo.
@@ -59,8 +61,8 @@ class PelotaoDoc {
         for (final MapEntry<String, dynamic> e in rotulosCrus.entries)
           if ((e.value as String).isNotEmpty) e.key: e.value as String,
       },
-      criadoEm: (dados['criadoEm'] as Timestamp).toDate(),
-      atualizadoEm: (dados['atualizadoEm'] as Timestamp).toDate(),
+      criadoEm: dataDeTimestampPendente(dados['criadoEm']),
+      atualizadoEm: dataDeTimestampPendente(dados['atualizadoEm']),
       pendente: doc.metadata.hasPendingWrites,
     );
   }
