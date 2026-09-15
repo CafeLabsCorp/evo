@@ -11,7 +11,6 @@
 library;
 
 import '../cadencia.dart';
-import '../catalogo.dart';
 import '../estado.dart';
 import '../geometria.dart';
 import '../movimento.dart';
@@ -19,6 +18,7 @@ import '../parte.dart';
 import '../percussao.dart';
 import '../preenchimento.dart';
 import '../simulador.dart';
+import 'comando_do_catalogo.dart';
 
 Cadencia cadenciaDoJson(String valor) => switch (valor) {
   'firme' => Cadencia.firme,
@@ -89,72 +89,49 @@ Map<String, dynamic> estadoFormacaoParaJson(EstadoFormacao formacao) =>
       },
     };
 
-Movimento movimentoDoJson(Map<String, dynamic> json) {
-  final String tipo = json['tipo'] as String;
-  final bool bate = json['bateRitmoAoJuntar'] as bool? ?? false;
-  final int tempos = json['tempos'] as int? ?? 1;
-  switch (tipo) {
-    case 'sentido':
-      return Catalogo.sentido(tempos: tempos);
-    case 'descansar':
-      return Catalogo.descansar(tempos: tempos);
-    case 'marcarPasso':
-      return Catalogo.marcarPasso(tempos: tempos, bateRitmoAoJuntar: bate);
-    case 'baterORitmo':
-      return Catalogo.baterORitmo(tempos: tempos);
-    case 'emFrenteMarche':
-      final int n = json['n'] as int;
-      final AoTerminarMarche aoTerminar = switch (json['aoTerminar']
-          as String) {
-        'marchando' => AoTerminarMarche.marchando,
-        'marcandoPasso' => AoTerminarMarche.marcandoPasso,
-        'firme' => AoTerminarMarche.firme,
-        final String outro => throw FormatException(
-          'aoTerminar desconhecido: "$outro"',
-        ),
-      };
-      return Catalogo.emFrenteMarche(
-        n,
-        aoTerminar: aoTerminar,
-        bateRitmoAoJuntar: bate,
-      );
-    case 'direitaVolverParado':
-      return Catalogo.direitaVolverParado(bateRitmoAoJuntar: bate);
-    case 'esquerdaVolverParado':
-      return Catalogo.esquerdaVolverParado(bateRitmoAoJuntar: bate);
-    case 'meiaVoltaParado':
-      return Catalogo.meiaVoltaParado(bateRitmoAoJuntar: bate);
-    case 'oitavaDireitaParado':
-      return Catalogo.oitavaDireitaParado(bateRitmoAoJuntar: bate);
-    case 'oitavaEsquerdaParado':
-      return Catalogo.oitavaEsquerdaParado(bateRitmoAoJuntar: bate);
-    case 'alto':
-      return Catalogo.alto(bateRitmoAoJuntar: bate);
-    case 'direitaVolverMarcha':
-      return Catalogo.direitaVolverMarcha(bateRitmoAoJuntar: bate);
-    case 'esquerdaVolverMarcha':
-      return Catalogo.esquerdaVolverMarcha(bateRitmoAoJuntar: bate);
-    case 'meiaVoltaMarcha':
-      return Catalogo.meiaVoltaMarcha(bateRitmoAoJuntar: bate);
-    case 'oitavaDireitaMarcha':
-      return Catalogo.oitavaDireitaMarcha(bateRitmoAoJuntar: bate);
-    case 'oitavaEsquerdaMarcha':
-      return Catalogo.oitavaEsquerdaMarcha(bateRitmoAoJuntar: bate);
-    default:
-      throw FormatException('Movimento desconhecido no catálogo: "$tipo"');
-  }
-}
+/// Lê um [Movimento] compilado direto do JSON de `movimento`. Desde a
+/// correção do buraco de round-trip, isto é só açúcar sobre o par
+/// `ComandoDoCatalogo.doJson` + `materializar` — mantido porque é
+/// conveniente quando só se quer RODAR o movimento (ex.: testes), sem
+/// precisar guardar o comando para depois serializar de volta. Quem
+/// precisa do round-trip completo (o caminho real de `atribuicaoDoJson`)
+/// usa `ComandoDoCatalogo.doJson` diretamente, para reter o comando-fonte
+/// dentro da `Atribuicao` — ver `atribuicaoDoJson` e o dartdoc de
+/// `Atribuicao`.
+Movimento movimentoDoJson(Map<String, dynamic> json) =>
+    ComandoDoCatalogo.doJson(json).materializar();
+
+/// Serializa um [ComandoDoCatalogo] para JSON — a metade de escrita que
+/// faltava (ver dartdoc de `ComandoDoCatalogo`, que faz toda a decisão de
+/// formato). Nome no plural de funções `xParaJson` deste arquivo por
+/// simetria com `cadenciaParaJson`/`estadoPessoaParaJson`, embora a lógica
+/// em si viva no método `ComandoDoCatalogo.paraJson`.
+Map<String, dynamic> comandoParaJson(ComandoDoCatalogo comando) =>
+    comando.paraJson();
 
 Preenchimento? preenchimentoDoJson(Map<String, dynamic>? json) {
   if (json == null) return null;
   return Preenchimento.paraCadencia(cadenciaDoJson(json['cadencia'] as String));
 }
 
+/// Serializa um [Preenchimento]. Round-trippa sem trabalho: todo
+/// `Preenchimento` é só uma cadência (`Preenchimento.paraCadencia` é a
+/// única forma de construir um), então basta guardar essa cadência —
+/// simétrico a [preenchimentoDoJson].
+Map<String, dynamic> preenchimentoParaJson(Preenchimento preenchimento) =>
+    <String, dynamic>{'cadencia': cadenciaParaJson(preenchimento.cadencia)};
+
 MembroPercussao membroPercussaoDoJson(String valor) => switch (valor) {
   'mao' => MembroPercussao.mao,
   'pernaEsquerda' => MembroPercussao.pernaEsquerda,
   'pernaDireita' => MembroPercussao.pernaDireita,
   _ => throw FormatException('Membro de percussão desconhecido no JSON: "$valor"'),
+};
+
+String membroPercussaoParaJson(MembroPercussao membro) => switch (membro) {
+  MembroPercussao.mao => 'mao',
+  MembroPercussao.pernaEsquerda => 'pernaEsquerda',
+  MembroPercussao.pernaDireita => 'pernaDireita',
 };
 
 /// `percussao` é opcional em `atribuicao`; ausente ⇒ `null` ⇒ nenhum
@@ -172,14 +149,48 @@ Percussao? percussaoDoJson(Map<String, dynamic>? json) {
   return Percussao(membro: membroPercussaoDoJson(json['membro'] as String));
 }
 
+/// Serializa uma [Percussao] — round-trippa sem trabalho, só `membro`.
+Map<String, dynamic> percussaoParaJson(Percussao percussao) =>
+    <String, dynamic>{'membro': membroPercussaoParaJson(percussao.membro)};
+
+/// Lê uma [Atribuicao] do JSON. Sempre constrói com `comando` (nunca com
+/// `movimento` direto) — é essa escolha, e só ela, que faz
+/// `atribuicaoParaJson(atribuicaoDoJson(json))` fechar o round-trip: ver o
+/// dartdoc do construtor de [Atribuicao].
 Atribuicao atribuicaoDoJson(Map<String, dynamic> json) => Atribuicao(
-  movimento: movimentoDoJson(json['movimento'] as Map<String, dynamic>),
+  comando: ComandoDoCatalogo.doJson(json['movimento'] as Map<String, dynamic>),
   offsetInicialTiques: json['offsetInicialTiques'] as int? ?? 0,
   preenchimento: preenchimentoDoJson(
     json['preenchimento'] as Map<String, dynamic>?,
   ),
   percussao: percussaoDoJson(json['percussao'] as Map<String, dynamic>?),
 );
+
+/// Serializa uma [Atribuicao] para JSON. Só funciona para atribuições
+/// construídas com `comando` — as construídas com `movimento` compilado
+/// direto (o atalho que ~40 testes do motor usam para simular sem passar
+/// por JSON) não têm de onde tirar tipo e parâmetros, e isto lança
+/// [StateError] em vez de produzir um JSON incompleto ou inventado.
+Map<String, dynamic> atribuicaoParaJson(Atribuicao atribuicao) {
+  final ComandoDoCatalogo? comando = atribuicao.comando;
+  if (comando == null) {
+    throw StateError(
+      'Atribuicao sem `comando` não pode virar JSON — foi construída com '
+      '`movimento` compilado direto (atalho interno de simulação/testes, '
+      'ver dartdoc de Atribuicao). Quem monta a partir do editor ou do '
+      'banco deve sempre fornecer `comando`.',
+    );
+  }
+  return <String, dynamic>{
+    'movimento': comandoParaJson(comando),
+    if (atribuicao.offsetInicialTiques != 0)
+      'offsetInicialTiques': atribuicao.offsetInicialTiques,
+    if (atribuicao.preenchimento != null)
+      'preenchimento': preenchimentoParaJson(atribuicao.preenchimento!),
+    if (atribuicao.percussao != null)
+      'percussao': percussaoParaJson(atribuicao.percussao!),
+  };
+}
 
 Parte parteDoJson(Map<String, dynamic> json) {
   final Map<String, dynamic> atribuicoes =
@@ -196,6 +207,15 @@ Parte parteDoJson(Map<String, dynamic> json) {
   );
 }
 
+Map<String, dynamic> parteParaJson(Parte parte) => <String, dynamic>{
+  'ordem': parte.ordem,
+  if (parte.nome != null) 'nome': parte.nome,
+  'atribuicoes': <String, dynamic>{
+    for (final MapEntry<int, Atribuicao> entrada in parte.atribuicoes.entries)
+      '${entrada.key}': atribuicaoParaJson(entrada.value),
+  },
+};
+
 Evolucao evolucaoDoJson(Map<String, dynamic> json) => Evolucao(
   nome: json['nome'] as String,
   estadoInicial: estadoFormacaoDoJson(
@@ -206,3 +226,11 @@ Evolucao evolucaoDoJson(Map<String, dynamic> json) => Evolucao(
       parteDoJson(parte as Map<String, dynamic>),
   ],
 );
+
+Map<String, dynamic> evolucaoParaJson(Evolucao evolucao) => <String, dynamic>{
+  'nome': evolucao.nome,
+  'estadoInicial': estadoFormacaoParaJson(evolucao.estadoInicial),
+  'partes': <dynamic>[
+    for (final Parte parte in evolucao.partes) parteParaJson(parte),
+  ],
+};

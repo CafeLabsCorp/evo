@@ -15,6 +15,7 @@ export 'src/diagnostico.dart';
 export 'src/estado.dart';
 export 'src/eventos.dart';
 export 'src/geometria.dart';
+export 'src/json/comando_do_catalogo.dart';
 export 'src/json/evolucao_json.dart';
 export 'src/movimento.dart';
 export 'src/parte.dart';

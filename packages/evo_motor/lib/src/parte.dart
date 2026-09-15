@@ -1,3 +1,4 @@
+import 'json/comando_do_catalogo.dart';
 import 'movimento.dart';
 import 'percussao.dart';
 import 'preenchimento.dart';
@@ -15,12 +16,38 @@ import 'preenchimento.dart';
 /// recalculado de formas diferentes em execuções diferentes), documentado
 /// aqui como simplificação de v1.
 class Atribuicao {
+  /// Aceita exatamente UM entre `movimento` (já compilado — segmentos
+  /// concretos, sem identidade serializável) e `comando` (o descritor
+  /// fonte do catálogo, round-trippable — ver [ComandoDoCatalogo]).
+  ///
+  /// Por que os dois caminhos, em vez de só `comando`: as ~40 atribuições
+  /// que os testes do motor constroem hoje passam um [Movimento] pronto
+  /// (`Catalogo.sentido(...)`, etc.) porque só querem simular — nunca
+  /// serializam nada, e reescrever todas para montar um
+  /// [ComandoDoCatalogo] não mudaria nenhum comportamento, só sintaxe.
+  /// O que o editor e o codec JSON exigem é o caminho inverso: toda
+  /// `Atribuicao` que vem de [atribuicaoDoJson] (via `evolucao_json.dart`)
+  /// é construída com `comando`, nunca com `movimento` direto — e é por
+  /// isso, e só por isso, que ela consegue voltar para JSON via
+  /// `atribuicaoParaJson` (que lança [StateError] se `comando` for nulo).
+  ///
+  /// Nunca os dois ao mesmo tempo nem nenhum: isso eliminaria a garantia
+  /// de fonte única — não existe como montar uma `Atribuicao` cujo
+  /// [movimento] não bata com seu [comando], porque só um dos dois é a
+  /// fonte real; o outro é sempre derivado dele.
   Atribuicao({
-    required this.movimento,
+    Movimento? movimento,
+    this.comando,
     this.offsetInicialTiques = 0,
     this.preenchimento,
     this.percussao,
-  }) : assert(offsetInicialTiques >= 0) {
+  }) : assert(offsetInicialTiques >= 0),
+       assert(
+         (movimento == null) != (comando == null),
+         'Atribuicao exige exatamente um entre `movimento` e `comando`, '
+         'nunca os dois nem nenhum — ver dartdoc do construtor.',
+       ),
+       _movimentoExplicito = movimento {
     if (offsetInicialTiques.isOdd) {
       throw ArgumentError.value(
         offsetInicialTiques,
@@ -33,7 +60,20 @@ class Atribuicao {
     }
   }
 
-  final Movimento movimento;
+  final Movimento? _movimentoExplicito;
+
+  /// O comando-fonte do catálogo (tipo + parâmetros) que originou esta
+  /// atribuição, quando ela foi construída a partir dele — `null` quando
+  /// foi construída com um [Movimento] já compilado direto (atalho interno
+  /// usado por testes, não serializável).
+  final ComandoDoCatalogo? comando;
+
+  /// O movimento compilado (segmentos concretos) usado pelo motor para
+  /// simular — derivado de [comando] quando presente, ou o valor recebido
+  /// direto no construtor caso contrário. `compilador.dart` só enxerga
+  /// isto, nunca [comando].
+  Movimento get movimento => _movimentoExplicito ?? comando!.materializar();
+
   final int offsetInicialTiques;
   final Preenchimento? preenchimento;
 
